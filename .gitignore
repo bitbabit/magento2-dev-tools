@@ -1,0 +1,40 @@
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Composer
+vendor/
+composer.lock
+
+# PHPUnit
+.phpunit.cache/
+Test/Coverage/
+
+# Magento specific
+var/
+pub/static/
+pub/media/
+generated/
+
+# Node modules (if any)
+node_modules/
+npm-debug.log*
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp 

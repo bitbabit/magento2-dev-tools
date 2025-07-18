@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    
+    <!-- Plugin for HTTP launch -->
+    <type name="Magento\Framework\App\Http">
+        <plugin name="dev_tools_http_launch" 
+                type="VelocityDev\DeveloperTools\Plugin\HttpLaunchPlugin" 
+                sortOrder="1"/>
+    </type>
+    
+      
+    <!-- Interface preferences -->
+    <preference for="VelocityDev\DeveloperTools\Api\ProfilerConfigInterface" 
+                type="VelocityDev\DeveloperTools\Model\Config\ProfilerConfig"/>
+    
+    <!-- Virtual types for different connections -->
+    <virtualType name="VelocityDev\DeveloperTools\Model\ResourceConnection\Read" 
+                 type="Magento\Framework\App\ResourceConnection">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Framework\App\DeploymentConfig</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\Console\CommandListInterface">
+    <arguments>
+        <argument name="commands" xsi:type="array">
+            <item name="profiler_enable" xsi:type="object">VelocityDev\DeveloperTools\Console\Command\EnableCommand</item>
+            <item name="profiler_disable" xsi:type="object">VelocityDev\DeveloperTools\Console\Command\DisableCommand</item>
+            <item name="profiler_status" xsi:type="object">VelocityDev\DeveloperTools\Console\Command\StatusCommand</item>
+            <item name="profiler_generate_api_key" xsi:type="object">VelocityDev\DeveloperTools\Console\GenerateApiKeyCommand</item>
+        </argument>
+    </arguments>
+</type>
+
+<!-- Virtual Logger Type -->
+<virtualType name="DeveloperToolsLogger" type="Magento\Framework\Logger\Monolog">
+    <arguments>
+        <argument name="name" xsi:type="string">profiler</argument>
+        <argument name="handlers" xsi:type="array">
+            <item name="system" xsi:type="object">DeveloperToolsLoggerHandler</item>
+        </argument>
+    </arguments>
+</virtualType>
+
+<!-- Log Handler -->
+<virtualType name="DeveloperToolsLoggerHandler" type="Magento\Framework\Logger\Handler\Base">
+    <arguments>
+        <argument name="fileName" xsi:type="string">/var/log/developer_tools.log</argument>
+    </arguments>
+</virtualType>
+
+<!-- Comprehensive Profiler Service -->
+<type name="VelocityDev\DeveloperTools\Service\ComprehensiveProfilerService">
+    <arguments>
+        <argument name="logger" xsi:type="object">DeveloperToolsLogger</argument>
+    </arguments>
+</type>
+</config>
