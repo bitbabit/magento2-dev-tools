@@ -73,6 +73,16 @@ php bin/magento setup:di:compile
 bin/magento setup:static-content:deploy -f
 ```
 
+If the package is not yet published to Packagist, you can install with explicit version:
+
+```bash
+composer require bitbabit/magento2-dev-tools:^1.2.0
+bin/magento module:enable BitBabit_DeveloperTools
+bin/magento setup:upgrade
+php bin/magento setup:di:compile
+bin/magento setup:static-content:deploy -f
+```
+
 ### Manual Installation
 
 1. Download the module files
@@ -351,7 +361,7 @@ For AJAX requests, profiler data is automatically injected into JSON responses:
   "metadata": {
     "generated_at": "2024-01-15 10:30:45",
     "request_id": "req_123456789",
-    "profiler_version": "1.2.0-beta1",
+    "profiler_version": "1.2.0",
     "memory_limit_exceeded": false,
     "timestamp": 1705315845
   },
@@ -570,7 +580,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Changelog
 
-### v1.2.0-beta1
+### v1.2.0
 - Initial public release
 - Complete profiling suite
 - API key authentication

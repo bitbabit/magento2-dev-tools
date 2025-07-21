@@ -2,7 +2,7 @@
     "name": "bitbabit/magento2-dev-tools",
     "description": "Advanced developer tools for Magento 2 with dynamic control and visualization",
     "type": "magento2-module",
-    "version": "1.2.0-beta1",
+    "version": "1.2.0",
     "license": "MIT",
     "homepage": "https://github.com/bitbabit/magento2-dev-tools",
     "support": {

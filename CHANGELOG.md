@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 ### Security
 
-## [1.2.0-beta1] - 2024-01-15
+## [1.2.0] - 2025-07-21
 
 ### Added
 - Complete developer tools suite for Magento 2
@@ -70,7 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Release Notes
 
-### v1.2.0-beta1 - "Complete Developer Suite"
+### v1.2.0 - "Complete Developer Suite"
 
 This is the first public beta release of BitBabit Developer Tools, providing a comprehensive development and debugging experience for Magento 2.
 

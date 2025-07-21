@@ -303,7 +303,7 @@ class ComprehensiveProfilerService
             'generated_at' => date('Y-m-d H:i:s'),
             'timestamp' => time(),
             'request_id' => uniqid('req_'),
-            'profiler_version' => '1.0.0',
+            'profiler_version' => '1.2.0',
             'memory_limit_exceeded' => $this->isMemoryLimitExceeded()
         ];
     }
