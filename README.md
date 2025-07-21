@@ -33,7 +33,6 @@ BitBabit Developer Tools is a comprehensive development and debugging suite for 
 - Secure header validation (`X-Debug-Api-Key`)
 - Developer mode restrictions
 - Cookie-based session management
-- CSRF protection integration
 
 ### 🌐 **Request Analysis**
 - HTTP request/response monitoring
@@ -54,7 +53,6 @@ BitBabit Developer Tools is a comprehensive development and debugging suite for 
 - Contextual debug messages
 - Interactive JSON tree visualization
 - Real-time message collection
-- Timer functionality for code blocks
 
 ### 📱 **Interactive Web Interface**
 - Modern, responsive toolbar widget
@@ -68,10 +66,11 @@ BitBabit Developer Tools is a comprehensive development and debugging suite for 
 ### Via Composer (Recommended)
 
 ```bash
-composer require bitbabitmagento2-dev-tools
+composer require bitbabit/magento2-dev-tools
 bin/magento module:enable BitBabit_DeveloperTools
 bin/magento setup:upgrade
-bin/magento cache:flush
+php bin/magento setup:di:compile
+bin/magento setup:static-content:deploy -f
 ```
 
 ### Manual Installation
@@ -83,8 +82,41 @@ bin/magento cache:flush
 ```bash
 bin/magento module:enable BitBabit_DeveloperTools
 bin/magento setup:upgrade
+php bin/magento setup:di:compile
+bin/magento setup:static-content:deploy -f
+```
+
+## Quick Setup
+
+After installation, follow these steps to get started:
+
+```bash
+# Enable the profiler
+bin/magento bitbabit:bitbabit:profiler:enable
+
+# Generate API key for frontend widget
+bin/magento bitbabit:devtools:generate-api-key
+
+# Copy the generated API key for frontend widget usage
+
+# Clear cache
 bin/magento cache:flush
 ```
+
+### Monolithic Frontend Widget Activation
+
+To enable the profiler widget and save the API key to cookies for persistent profiling:
+
+```
+https://YOUR_FRONTEND_URL?api_key=YOUR_GENERATED_API_KEY
+```
+
+This will:
+- Enable the profiler widget on your frontend
+- Save the API key to cookies for automatic profiling on subsequent requests
+- Allow you to see the profiler widget on all pages
+
+**Note**: Boot time and memory management features are currently under development, so data may not be 100% accurate.
 
 ## Configuration
 
@@ -111,13 +143,13 @@ Navigate to **Stores → Configuration → BitBabit → Developer Tools**
 #### Enable/Disable Profiler
 ```bash
 # Enable profiler
-bin/magento profiler:enable
+bin/magento bitbabit:profiler:enable
 
 # Disable profiler  
-bin/magento profiler:disable
+bin/magento bitbabit:profiler:disable
 
 # Check status
-bin/magento profiler:status
+bin/magento bitbabit:profiler:status
 ```
 
 #### API Key Management
@@ -230,7 +262,6 @@ For AJAX requests, profiler data is automatically injected into JSON responses:
 - **Timing-Safe Comparison**: Prevents timing attacks
 - **Developer Mode Restriction**: Production safety
 - **Cookie Security**: Secure, HTTP-only cookie handling
-- **CSRF Integration**: Magento's built-in CSRF protection
 
 ## Data Structure
 
@@ -425,15 +456,14 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 
 ### Access Control
 - Developer mode restrictions
-- IP-based filtering (extensible)
-- Session validation
-- CSRF protection
+- API key authentication
+- Request header validation
 
 ### Data Privacy
-- No sensitive data logging by default
+- Limited sensitive data collection (session data capped at 10 items)
 - Configurable data exposure levels
 - Secure transmission headers
-- Auto-cleanup of temporary data
+- Memory usage limits to prevent resource exhaustion
 
 ## Troubleshooting
 
