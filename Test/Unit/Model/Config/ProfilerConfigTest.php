@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace VelocityDev\DeveloperTools\Test\Unit\Model\Config;
+namespace BitBabit\DeveloperTools\Test\Unit\Model\Config;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -9,13 +9,13 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\State;
 use Magento\Framework\HTTP\PhpEnvironment\Request;
 use Magento\Framework\Math\Random;
-use VelocityDev\DeveloperTools\Model\Config\ProfilerConfig;
-use VelocityDev\DeveloperTools\Api\ProfilerConfigInterface;
-use VelocityDev\DeveloperTools\Service\ApiKeyCookieManagerService;
+use BitBabit\DeveloperTools\Model\Config\ProfilerConfig;
+use BitBabit\DeveloperTools\Api\ProfilerConfigInterface;
+use BitBabit\DeveloperTools\Service\ApiKeyCookieManagerService;
 
 /**
  * Test class for ProfilerConfig
- * @package VelocityDev\DeveloperTools\Test\Unit\Model\Config
+ * @package BitBabit\DeveloperTools\Test\Unit\Model\Config
  */
 class ProfilerConfigTest extends TestCase
 {

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace VelocityDev\DeveloperTools\Test\Unit\Console\Command;
+namespace BitBabit\DeveloperTools\Test\Unit\Console\Command;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -9,12 +9,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
 use Magento\Framework\App\Config\Storage\WriterInterface;
-use VelocityDev\DeveloperTools\Console\Command\EnableCommand;
-use VelocityDev\DeveloperTools\Api\ProfilerConfigInterface;
+use BitBabit\DeveloperTools\Console\Command\EnableCommand;
+use BitBabit\DeveloperTools\Api\ProfilerConfigInterface;
 
 /**
  * Test class for EnableCommand
- * @package VelocityDev\DeveloperTools\Test\Unit\Console\Command
+ * @package BitBabit\DeveloperTools\Test\Unit\Console\Command
  */
 class EnableCommandTest extends TestCase
 {

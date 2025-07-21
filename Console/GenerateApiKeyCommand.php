@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace VelocityDev\DeveloperTools\Console;
+namespace BitBabit\DeveloperTools\Console;
 
 use Magento\Framework\App\Config\ConfigResource\ConfigInterface;
 use Magento\Framework\Console\Cli;
-use VelocityDev\DeveloperTools\Api\ProfilerConfigInterface;
+use BitBabit\DeveloperTools\Api\ProfilerConfigInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -34,7 +34,7 @@ class GenerateApiKeyCommand extends Command
      */
     protected function configure(): void
     {
-        $this->setName('velocity:devtools:generate-api-key')
+        $this->setName('bitbabit:devtools:generate-api-key')
             ->setDescription('Generate API key for Developer Tools')
             ->addOption(
                 self::OPTION_REGENERATE,

@@ -1,20 +1,20 @@
 {
-    "name": "babit-choudhary/magento2-dev-tools",
+    "name": "bitbabit/magento2-dev-tools",
     "description": "Advanced developer tools for Magento 2 with dynamic control and visualization",
     "type": "magento2-module",
     "version": "1.2.0-beta1",
     "license": "MIT",
-    "homepage": "https://github.com/babit-choudhary/magento2-dev-tools",
+    "homepage": "https://github.com/bitbabit/magento2-dev-tools",
     "support": {
-        "issues": "https://github.com/babit-choudhary/magento2-dev-tools/issues",
-        "source": "https://github.com/babit-choudhary/magento2-dev-tools",
-        "docs": "https://github.com/babit-choudhary/magento2-dev-tools/blob/main/README.md"
+        "issues": "https://github.com/bitbabit/magento2-dev-tools/issues",
+        "source": "https://github.com/bitbabit/magento2-dev-tools",
+        "docs": "https://github.com/bitbabit/magento2-dev-tools/blob/main/README.md"
     },
     "authors": [
         {
             "name": "Babit Kumar",
             "email": "babitkumar6@gmail.com",
-            "homepage": "https://github.com/babit-choudhary",
+            "homepage": "https://github.com/bitbabit",
             "role": "Developer"
         }
     ],
@@ -55,12 +55,12 @@
             "registration.php"
         ],
         "psr-4": {
-            "VelocityDev\\DeveloperTools\\": ""
+            "BitBabit\\DeveloperTools\\": ""
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VelocityDev\\DeveloperTools\\Test\\": "Test/"
+            "BitBabit\\DeveloperTools\\Test\\": "Test/"
         }
     },
     "config": {

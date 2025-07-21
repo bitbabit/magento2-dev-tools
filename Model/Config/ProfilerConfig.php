@@ -1,18 +1,18 @@
 <?php
 declare(strict_types=1);
 
-namespace VelocityDev\DeveloperTools\Model\Config;
+namespace BitBabit\DeveloperTools\Model\Config;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\State;
 use Magento\Framework\HTTP\PhpEnvironment\Request;
 use Magento\Framework\Math\Random;
-use VelocityDev\DeveloperTools\Api\ProfilerConfigInterface;
-use VelocityDev\DeveloperTools\Service\ApiKeyCookieManagerService;
+use BitBabit\DeveloperTools\Api\ProfilerConfigInterface;
+use BitBabit\DeveloperTools\Service\ApiKeyCookieManagerService;
 
 /**
  * ProfilerConfig
- * @package VelocityDev\DeveloperTools\Model\Config
+ * @package BitBabit\DeveloperTools\Model\Config
  */
 class ProfilerConfig implements ProfilerConfigInterface
 {

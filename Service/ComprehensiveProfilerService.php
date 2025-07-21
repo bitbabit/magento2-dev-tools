@@ -1,19 +1,19 @@
 <?php
 declare(strict_types=1);
 
-namespace VelocityDev\DeveloperTools\Service;
+namespace BitBabit\DeveloperTools\Service;
 
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\HTTP\PhpEnvironment\Request;
 use Magento\Framework\App\State;
 use Psr\Log\LoggerInterface;
-use VelocityDev\DeveloperTools\Api\ProfilerConfigInterface;
-use VelocityDev\DeveloperTools\Model\DebugInfo;
+use BitBabit\DeveloperTools\Api\ProfilerConfigInterface;
+use BitBabit\DeveloperTools\Model\DebugInfo;
 
 /**
  * ComprehensiveProfilerService
- * @package VelocityDev\DeveloperTools\Service
+ * @package BitBabit\DeveloperTools\Service
  */
 class ComprehensiveProfilerService
 {

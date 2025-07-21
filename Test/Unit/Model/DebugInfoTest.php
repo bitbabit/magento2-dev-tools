@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace VelocityDev\DeveloperTools\Test\Unit\Model;
+namespace BitBabit\DeveloperTools\Test\Unit\Model;
 
-use VelocityDev\DeveloperTools\Model\DebugInfo;
+use BitBabit\DeveloperTools\Model\DebugInfo;
 use PHPUnit\Framework\TestCase;
 
 /**

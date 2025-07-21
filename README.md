@@ -1,16 +1,16 @@
-# VelocityDev Developer Tools for Magento 2
+# BitBabit Developer Tools for Magento 2
 
-[![Latest Stable Version](https://poser.pugx.org/velocitydev/magento2-dev-tools/v/stable)](https://packagist.org/packages/velocitydev/magento2-dev-tools)
-[![Total Downloads](https://poser.pugx.org/velocitydev/magento2-dev-tools/downloads)](https://packagist.org/packages/velocitydev/magento2-dev-tools)
-[![License](https://poser.pugx.org/velocitydev/magento2-dev-tools/license)](https://packagist.org/packages/velocitydev/magento2-dev-tools)
-[![PHP Version Require](https://poser.pugx.org/velocitydev/magento2-dev-tools/require/php)](https://packagist.org/packages/velocitydev/magento2-dev-tools)
+[![Latest Stable Version](https://poser.pugx.org/bitbabit/magento2-dev-tools/v/stable)](https://packagist.org/packages/bitbabit/magento2-dev-tools)
+[![Total Downloads](https://poser.pugx.org/bitbabit/magento2-dev-tools/downloads)](https://packagist.org/packages/bitbabit/magento2-dev-tools)
+[![License](https://poser.pugx.org/bitbabit/magento2-dev-tools/license)](https://packagist.org/packages/bitbabit/magento2-dev-tools)
+[![PHP Version Require](https://poser.pugx.org/bitbabit/magento2-dev-tools/require/php)](https://packagist.org/packages/bitbabit/magento2-dev-tools)
 [![Magento](https://img.shields.io/badge/magento-2.4+-orange.svg)](https://magento.com)
-[![GitHub Stars](https://img.shields.io/github/stars/velocitydev/magento2-dev-tools.svg)](https://github.com/velocitydev/magento2-dev-tools/stargazers)
-[![GitHub Issues](https://img.shields.io/github/issues/velocitydev/magento2-dev-tools.svg)](https://github.com/velocitydev/magento2-dev-tools/issues)
+[![GitHub Stars](https://img.shields.io/github/stars/bitbabit/magento2-dev-tools.svg)](https://github.com/bitbabit/magento2-dev-tools/stargazers)
+[![GitHub Issues](https://img.shields.io/github/issues/bitbabit/magento2-dev-tools.svg)](https://github.com/bitbabit/magento2-dev-tools/issues)
 
 ## Overview
 
-VelocityDev Developer Tools is a comprehensive development and debugging suite for Magento 2 that provides real-time performance monitoring, database query profiling, and advanced debugging capabilities. It features a modern, interactive web-based toolbar similar to Symfony's DebugBar or Laravel Debugbar.
+BitBabit Developer Tools is a comprehensive development and debugging suite for Magento 2 that provides real-time performance monitoring, database query profiling, and advanced debugging capabilities. It features a modern, interactive web-based toolbar similar to Symfony's DebugBar or Laravel Debugbar.
 
 ## Key Features
 
@@ -68,8 +68,8 @@ VelocityDev Developer Tools is a comprehensive development and debugging suite f
 ### Via Composer (Recommended)
 
 ```bash
-composer require velocitydev/magento2-dev-tools
-bin/magento module:enable VelocityDev_DeveloperTools
+composer require bitbabitmagento2-dev-tools
+bin/magento module:enable BitBabit_DeveloperTools
 bin/magento setup:upgrade
 bin/magento cache:flush
 ```
@@ -77,11 +77,11 @@ bin/magento cache:flush
 ### Manual Installation
 
 1. Download the module files
-2. Extract to `app/code/VelocityDev/DeveloperTools/`
+2. Extract to `app/code/BitBabit/DeveloperTools/`
 3. Run the following commands:
 
 ```bash
-bin/magento module:enable VelocityDev_DeveloperTools
+bin/magento module:enable BitBabit_DeveloperTools
 bin/magento setup:upgrade
 bin/magento cache:flush
 ```
@@ -90,7 +90,7 @@ bin/magento cache:flush
 
 ### Admin Configuration
 
-Navigate to **Stores → Configuration → VelocityDev → Developer Tools**
+Navigate to **Stores → Configuration → BitBabit → Developer Tools**
 
 #### Basic Settings
 - **Enable Developer Tools**: Master toggle for the entire module
@@ -123,10 +123,10 @@ bin/magento profiler:status
 #### API Key Management
 ```bash
 # Generate new API key
-bin/magento velocity:devtools:generate-api-key
+bin/magento bitbabit:devtools:generate-api-key
 
 # Regenerate existing API key
-bin/magento velocity:devtools:generate-api-key --regenerate
+bin/magento bitbabit:devtools:generate-api-key --regenerate
 ```
 
 ## Usage
@@ -156,7 +156,7 @@ headers: {
 
 ```php
 <?php
-use VelocityDev\DeveloperTools\Helper\Debug;
+use BitBabit\DeveloperTools\Helper\Debug;
 
 // Basic logging
 Debug::info('Processing order', ['order_id' => 123]);
@@ -440,7 +440,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 ### Common Issues
 
 #### Toolbar Not Appearing
-1. Check if module is enabled: `bin/magento module:status VelocityDev_DeveloperTools`
+1. Check if module is enabled: `bin/magento module:status BitBabit_DeveloperTools`
 2. Verify API key configuration
 3. Ensure correct headers are sent
 4. Check browser console for JavaScript errors
@@ -452,7 +452,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 4. Monitor server resources
 
 #### API Key Problems
-1. Regenerate API key: `bin/magento velocity:devtools:generate-api-key --regenerate`
+1. Regenerate API key: `bin/magento bitbabit:devtools:generate-api-key --regenerate`
 2. Clear browser storage
 3. Verify header transmission
 4. Check admin configuration
@@ -463,7 +463,7 @@ Enable debug logging in the JavaScript widget:
 
 ```javascript
 // In browser console
-velocityDevProfiler.isDebugEnabled = true;
+DevProfiler.isDebugEnabled = true;
 ```
 
 ### Log Files

@@ -3,6 +3,6 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="controller_front_send_response_before">
         <observer name="dev_tools_response_observer" 
-                  instance="VelocityDev\DeveloperTools\Observer\ResponseObserver"/>
+                  instance="BitBabit\DeveloperTools\Observer\ResponseObserver"/>
     </event>
 </config>

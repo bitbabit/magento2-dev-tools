@@ -5,8 +5,8 @@
         <resources>
             <resource id="Magento_Backend::admin">
                 <resource id="Magento_Backend::system">
-                    <resource id="VelocityDev_DeveloperTools::devtools" title="Dev Tools" sortOrder="100">
-                        <resource id="VelocityDev_DeveloperTools::devtools_config" title="Configuration" sortOrder="30"/>
+                    <resource id="BitBabit_DeveloperTools::devtools" title="Dev Tools" sortOrder="100">
+                        <resource id="BitBabit_DeveloperTools::devtools_config" title="Configuration" sortOrder="30"/>
                     </resource>
                 </resource>
             </resource>

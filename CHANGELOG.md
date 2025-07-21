@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - API key authentication system for secure access
 - Interactive web-based toolbar widget with collapsible panels
 - Console commands for profiler management (`profiler:enable`, `profiler:disable`, `profiler:status`)
-- API key generation command (`velocity:devtools:generate-api-key`)
+- API key generation command (`bitbabit:devtools:generate-api-key`)
 - Multi-level debug logging system (info, warning, error, debug)
 - Request analysis with headers, parameters, and session inspection
 - Environment information display (PHP, server, extensions)
@@ -72,7 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### v1.2.0-beta1 - "Complete Developer Suite"
 
-This is the first public beta release of VelocityDev Developer Tools, providing a comprehensive development and debugging experience for Magento 2.
+This is the first public beta release of BitBabit Developer Tools, providing a comprehensive development and debugging experience for Magento 2.
 
 **🎯 Key Highlights:**
 - **Real-time Database Profiling**: Monitor SQL queries with execution times and parameter visualization
@@ -100,7 +100,7 @@ This is the first public beta release of VelocityDev Developer Tools, providing 
 - Collapsible panels for organized data viewing
 - JSON tree visualization for complex structures
 
-This release establishes VelocityDev Developer Tools as a professional-grade debugging solution for Magento 2, providing developers with the insights they need to build better applications.
+This release establishes BitBabit Developer Tools as a professional-grade debugging solution for Magento 2, providing developers with the insights they need to build better applications.
 
 ---
 
@@ -128,7 +128,7 @@ For detailed upgrade instructions and compatibility information, see [README.md]
 
 ## Links
 
-- [Repository](https://github.com/velocitydev/magento2-dev-tools)
-- [Issues](https://github.com/velocitydev/magento2-dev-tools/issues)
-- [Releases](https://github.com/velocitydev/magento2-dev-tools/releases)
-- [Packagist](https://packagist.org/packages/velocitydev/magento2-dev-tools) 
+- [Repository](https://github.com/bitbabit/magento2-dev-tools)
+- [Issues](https://github.com/bitbabit/magento2-dev-tools/issues)
+- [Releases](https://github.com/bitbabit/magento2-dev-tools/releases)
+- [Packagist](https://packagist.org/packages/bitbabit/magento2-dev-tools) 

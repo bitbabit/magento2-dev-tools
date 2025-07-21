@@ -1,4 +1,4 @@
-# Publishing VelocityDev DeveloperTools to GitHub & Packagist
+# Publishing BitBabit DeveloperTools to GitHub & Packagist
 
 This guide walks you through publishing your Magento 2 module to GitHub and making it available via Composer Packagist.
 
@@ -79,7 +79,7 @@ Create `LICENSE`:
 ```text
 MIT License
 
-Copyright (c) 2024 VelocityDev
+Copyright (c) 2024 BitBabit
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -106,22 +106,22 @@ Update your `composer.json` with complete metadata:
 
 ```json
 {
-    "name": "velocitydev/magento2-dev-tools",
+    "name": "bitbabitmagento2-dev-tools",
     "description": "Advanced developer tools for Magento 2 with dynamic control and visualization",
     "type": "magento2-module",
     "version": "1.2.0-beta1",
     "license": "MIT",
-    "homepage": "https://github.com/velocitydev/magento2-dev-tools",
+    "homepage": "https://github.com/bitbabit/magento2-dev-tools",
     "support": {
-        "issues": "https://github.com/velocitydev/magento2-dev-tools/issues",
-        "source": "https://github.com/velocitydev/magento2-dev-tools",
-        "docs": "https://github.com/velocitydev/magento2-dev-tools/blob/main/README.md"
+        "issues": "https://github.com/bitbabit/magento2-dev-tools/issues",
+        "source": "https://github.com/bitbabit/magento2-dev-tools",
+        "docs": "https://github.com/bitbabit/magento2-dev-tools/blob/main/README.md"
     },
     "authors": [
         {
             "name": "Babit Kumar",
             "email": "babitkumar6@gmail.com",
-            "homepage": "https://github.com/velocitydev",
+            "homepage": "https://github.com/bitbabit",
             "role": "Developer"
         }
     ],
@@ -162,12 +162,12 @@ Update your `composer.json` with complete metadata:
             "registration.php"
         ],
         "psr-4": {
-            "VelocityDev\\DeveloperTools\\": ""
+            "BitBabit\\DeveloperTools\\": ""
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VelocityDev\\DeveloperTools\\Test\\": "Test/"
+            "BitBabit\\DeveloperTools\\Test\\": "Test/"
         }
     },
     "config": {
@@ -216,7 +216,7 @@ git remote add origin https://github.com/YOUR-USERNAME/magento2-dev-tools.git
 git add .
 
 # Make initial commit
-git commit -m "Initial commit: VelocityDev Developer Tools v1.2.0-beta1
+git commit -m "Initial commit: BitBabit Developer Tools v1.2.0-beta1
 
 - Complete developer tools suite for Magento 2
 - Database query profiling with real-time monitoring
@@ -344,10 +344,10 @@ Test your package installation:
 
 ```bash
 # Test in a fresh Magento 2 installation
-composer require velocitydev/magento2-dev-tools
+composer require bitbabitmagento2-dev-tools
 
 # Enable module
-bin/magento module:enable VelocityDev_DeveloperTools
+bin/magento module:enable BitBabit_DeveloperTools
 bin/magento setup:upgrade
 ```
 
@@ -363,14 +363,14 @@ bin/magento setup:upgrade
 ### 8.2 Create docs/index.md
 
 ```markdown
-# VelocityDev Developer Tools Documentation
+# BitBabit Developer Tools Documentation
 
 [View on GitHub](https://github.com/YOUR-USERNAME/magento2-dev-tools)
 
 ## Quick Start
 
 ```bash
-composer require velocitydev/magento2-dev-tools
+composer require bitbabitmagento2-dev-tools
 ```
 
 [Full Documentation](README.md)
@@ -381,10 +381,10 @@ composer require velocitydev/magento2-dev-tools
 ### 9.1 Add Badges to README
 
 ```markdown
-[![Latest Stable Version](https://poser.pugx.org/velocitydev/magento2-dev-tools/v/stable)](https://packagist.org/packages/velocitydev/magento2-dev-tools)
-[![Total Downloads](https://poser.pugx.org/velocitydev/magento2-dev-tools/downloads)](https://packagist.org/packages/velocitydev/magento2-dev-tools)
-[![License](https://poser.pugx.org/velocitydev/magento2-dev-tools/license)](https://packagist.org/packages/velocitydev/magento2-dev-tools)
-[![PHP Version Require](https://poser.pugx.org/velocitydev/magento2-dev-tools/require/php)](https://packagist.org/packages/velocitydev/magento2-dev-tools)
+[![Latest Stable Version](https://poser.pugx.org/bitbabit/magento2-dev-tools/v/stable)](https://packagist.org/packages/bitbabit/magento2-dev-tools)
+[![Total Downloads](https://poser.pugx.org/bitbabit/magento2-dev-tools/downloads)](https://packagist.org/packages/bitbabit/magento2-dev-tools)
+[![License](https://poser.pugx.org/bitbabit/magento2-dev-tools/license)](https://packagist.org/packages/bitbabit/magento2-dev-tools)
+[![PHP Version Require](https://poser.pugx.org/bitbabit/magento2-dev-tools/require/php)](https://packagist.org/packages/bitbabit/magento2-dev-tools)
 ```
 
 ### 9.2 Share on Community Platforms
@@ -463,7 +463,7 @@ Monitor your package success:
 
 ---
 
-After following this guide, your VelocityDev Developer Tools module will be:
+After following this guide, your BitBabit Developer Tools module will be:
 - ✅ Published on GitHub with proper documentation
 - ✅ Available via Composer/Packagist
 - ✅ Auto-updating on new releases

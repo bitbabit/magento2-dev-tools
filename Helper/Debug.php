@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace VelocityDev\DeveloperTools\Helper;
+namespace BitBabit\DeveloperTools\Helper;
 
-use VelocityDev\DeveloperTools\Model\DebugInfo;
+use BitBabit\DeveloperTools\Model\DebugInfo;
 
 /**
  * Debug helper for easy access to DebugInfo singleton
- * @package VelocityDev\DeveloperTools\Helper
+ * @package BitBabit\DeveloperTools\Helper
  */
 class Debug
 {

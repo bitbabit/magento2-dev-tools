@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace VelocityDev\DeveloperTools\Test\Unit\Console;
+namespace BitBabit\DeveloperTools\Test\Unit\Console;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -10,12 +10,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
 use Magento\Framework\Console\Cli;
 use Magento\Framework\App\Config\ConfigResource\ConfigInterface;
-use VelocityDev\DeveloperTools\Console\GenerateApiKeyCommand;
-use VelocityDev\DeveloperTools\Api\ProfilerConfigInterface;
+use BitBabit\DeveloperTools\Console\GenerateApiKeyCommand;
+use BitBabit\DeveloperTools\Api\ProfilerConfigInterface;
 
 /**
  * Test class for GenerateApiKeyCommand
- * @package VelocityDev\DeveloperTools\Test\Unit\Console
+ * @package BitBabit\DeveloperTools\Test\Unit\Console
  */
 class GenerateApiKeyCommandTest extends TestCase
 {
@@ -65,7 +65,7 @@ class GenerateApiKeyCommandTest extends TestCase
      */
     public function testConfigure(): void
     {
-        $this->assertEquals('velocity:devtools:generate-api-key', $this->generateApiKeyCommand->getName());
+        $this->assertEquals('bitbabit:devtools:generate-api-key', $this->generateApiKeyCommand->getName());
         $this->assertEquals('Generate API key for Developer Tools', $this->generateApiKeyCommand->getDescription());
     }
 

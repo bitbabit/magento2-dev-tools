@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace VelocityDev\DeveloperTools\Observer;
+namespace BitBabit\DeveloperTools\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -11,14 +11,14 @@ use Magento\Framework\App\State as AppState;
 use Magento\Framework\View\DesignInterface;
 use Magento\Framework\Locale\ResolverInterface as LocaleResolver;
 use Magento\Store\Model\StoreManagerInterface;
-use VelocityDev\DeveloperTools\Api\ProfilerConfigInterface;
-use VelocityDev\DeveloperTools\Service\ComprehensiveProfilerService;
+use BitBabit\DeveloperTools\Api\ProfilerConfigInterface;
+use BitBabit\DeveloperTools\Service\ComprehensiveProfilerService;
 use Magento\Framework\App\ResourceConnection;
-use VelocityDev\DeveloperTools\Service\ApiKeyCookieManagerService;
+use BitBabit\DeveloperTools\Service\ApiKeyCookieManagerService;
 
 /**
  * ResponseObserver
- * @package VelocityDev\DeveloperTools\Observer
+ * @package BitBabit\DeveloperTools\Observer
  */
 class ResponseObserver implements ObserverInterface
 {
@@ -188,13 +188,13 @@ class ResponseObserver implements ObserverInterface
                 script.src = '{$jsUrl}';
                 script.onload = function() {
                     // Initialize with profiler data once the script is loaded
-                    if (window.velocityDevProfiler) {
-                        window.velocityDevProfiler.addInitialPageData({$profilerDataJson});
+                    if (window.DevProfiler) {
+                        window.DevProfiler.addInitialPageData({$profilerDataJson});
                     } else {
                         // Fallback: wait a bit and try again
                         setTimeout(function() {
-                            if (window.velocityDevProfiler) {
-                                window.velocityDevProfiler.addInitialPageData({$profilerDataJson});
+                            if (window.DevProfiler) {
+                                window.DevProfiler.addInitialPageData({$profilerDataJson});
                             }
                         }, 100);
                     }
@@ -220,12 +220,12 @@ class ResponseObserver implements ObserverInterface
                 'area' => $this->getCurrentArea(),
                 'theme' => $this->getCurrentTheme(),
                 'locale' => $this->getCurrentLocale(),
-                'module' => 'VelocityDev_DeveloperTools'
+                'module' => 'BitBabit_DeveloperTools'
             ];
 
             // Use Magento's asset repository to get the proper URL for the JavaScript file
             $asset = $this->assetRepository->createAsset(
-                'VelocityDev_DeveloperTools::js/profiler-widget.js',
+                'BitBabit_DeveloperTools::js/profiler-widget.js',
                 $params
             );
 
@@ -233,7 +233,7 @@ class ResponseObserver implements ObserverInterface
         } catch (\Exception $e) {
             // Fallback to a relative path if asset generation fails
             // This should work for most cases but won't go through Magento's static file processing
-            return '/app/code/VelocityDev/DeveloperTools/view/frontend/web/js/profiler-widget.js';
+            return '/app/code/BitBabit/DeveloperTools/view/frontend/web/js/profiler-widget.js';
         }
     }
 
@@ -248,17 +248,17 @@ class ResponseObserver implements ObserverInterface
                 'area' => $this->getCurrentArea(),
                 'theme' => $this->getCurrentTheme(),
                 'locale' => $this->getCurrentLocale(),
-                'module' => 'VelocityDev_DeveloperTools'
+                'module' => 'BitBabit_DeveloperTools'
             ];
 
             $asset = $this->assetRepository->createAsset(
-                'VelocityDev_DeveloperTools::css/profiler-widget.css',
+                'BitBabit_DeveloperTools::css/profiler-widget.css',
                 $params
             );
 
             return $asset->getUrl();
         } catch (\Exception $e) {
-            return '/app/code/VelocityDev/DeveloperTools/view/frontend/web/css/profiler-widget.css';
+            return '/app/code/BitBabit/DeveloperTools/view/frontend/web/css/profiler-widget.css';
         }
     }
 

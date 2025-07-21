@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace VelocityDev\DeveloperTools\Model;
+namespace BitBabit\DeveloperTools\Model;
 
 /**
  * DebugInfo singleton class for collecting debug messages
- * @package VelocityDev\DeveloperTools\Model
+ * @package BitBabit\DeveloperTools\Model
  */
 class DebugInfo
 {

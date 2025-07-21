@@ -1,34 +1,34 @@
 <?php
 declare(strict_types=1);
 
-namespace VelocityDev\DeveloperTools\Api;
+namespace BitBabit\DeveloperTools\Api;
 
 /**
  * ProfilerConfigInterface
- * @package VelocityDev\DeveloperTools\Api
+ * @package BitBabit\DeveloperTools\Api
  */
 interface ProfilerConfigInterface
 {
     /**
      * XML path for the profiler status
      */
-    public const XML_PATH_ENABLED = 'velocitydev/dev_tools/enabled';
+    public const XML_PATH_ENABLED = 'bitbabit/dev_tools/enabled';
     
 
     /**
      * XML path for the profiler header key
      */
-    public const XML_PATH_HEADER_KEY = 'velocitydev/dev_tools/profiler_header_key';
+    public const XML_PATH_HEADER_KEY = 'bitbabit/dev_tools/profiler_header_key';
 
     /**
      * XML path for the API key validation
      */
-    public const XML_PATH_API_KEY_ENABLED = 'velocitydev/dev_tools/api_key_enabled';
+    public const XML_PATH_API_KEY_ENABLED = 'bitbabit/dev_tools/api_key_enabled';
 
     /**
      * XML path for the API key
      */
-    public const XML_PATH_API_KEY = 'velocitydev/dev_tools/api_key';
+    public const XML_PATH_API_KEY = 'bitbabit/dev_tools/api_key';
 
     /**
      * API key header name
@@ -38,37 +38,37 @@ interface ProfilerConfigInterface
     /**
      * XML path for the HTML output
      */
-    public const XML_PATH_HTML_OUTPUT = 'velocitydev/dev_tools/html_output_enabled';
+    public const XML_PATH_HTML_OUTPUT = 'bitbabit/dev_tools/html_output_enabled';
 
     /**
      * XML path for the JSON injection
      */
-    public const XML_PATH_JSON_INJECTION = 'velocitydev/dev_tools/json_injection_enabled';
+    public const XML_PATH_JSON_INJECTION = 'bitbabit/dev_tools/json_injection_enabled';
 
     /**
      * XML path for the log to file
      */
-    public const XML_PATH_LOG_TO_FILE = 'velocitydev/dev_tools/log_to_file_enabled';
+    public const XML_PATH_LOG_TO_FILE = 'bitbabit/dev_tools/log_to_file_enabled';
 
     /**
      * XML path for the developer mode only
      */
-    public const XML_PATH_DEVELOPER_MODE_ONLY = 'velocitydev/dev_tools/developer_mode_only';
+    public const XML_PATH_DEVELOPER_MODE_ONLY = 'bitbabit/dev_tools/developer_mode_only';
 
     /**
      * XML path for the slow query threshold
      */
-    public const XML_PATH_SLOW_QUERY_THRESHOLD = 'velocitydev/dev_tools/slow_query_threshold';
+    public const XML_PATH_SLOW_QUERY_THRESHOLD = 'bitbabit/dev_tools/slow_query_threshold';
 
     /**
      * XML path for the toolbar widget
      */
-    public const XML_PATH_TOOLBAR_WIDGET = 'velocitydev/dev_tools/toolbar_widget_enabled';
+    public const XML_PATH_TOOLBAR_WIDGET = 'bitbabit/dev_tools/toolbar_widget_enabled';
 
     /**
      * XML path for the memory limit
      */
-    public const XML_PATH_MEMORY_LIMIT = 'velocitydev/dev_tools/memory_limit_mb';
+    public const XML_PATH_MEMORY_LIMIT = 'bitbabit/dev_tools/memory_limit_mb';
 
     /**
      * Default header key

@@ -1,5 +1,5 @@
 /**
- * VelocityDev Developer Tools - JavaScript Profiler Widget
+ * BitBabit Developer Tools - JavaScript Profiler Widget
  * Handles dynamic profiler panel creation and updates
  */
 
@@ -51,7 +51,7 @@ class ProfilerWidget {
      * Initialize IndexedDB
      */
     initIndexedDB() {
-        const request = indexedDB.open('VelocityDevTools', 1);
+        const request = indexedDB.open('DevToolsDB', 1);
         
         request.onerror = () => {
             this.debugLog('IndexedDB failed, falling back to localStorage');
@@ -291,7 +291,7 @@ class ProfilerWidget {
         if (this.isCollapsed) {
             // Show only the floating debugger icon
             return `
-                <div class="vel-debugger-icon" style="position: fixed; bottom: 24px; left: 24px; z-index: 1000000; cursor: pointer; background: #2563eb; border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15);" onclick="velocityDevProfiler.toggleCollapse()" title="Show Profiler">
+                <div class="vel-debugger-icon" style="position: fixed; bottom: 24px; left: 24px; z-index: 1000000; cursor: pointer; background: #2563eb; border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15);" onclick="DevProfiler.toggleCollapse()" title="Show Profiler">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#fff" stroke-width="2" stroke-linejoin="round"></path><path d="M2 17L12 22L22 17" stroke="#fff" stroke-width="2" stroke-linejoin="round"></path><path d="M2 12L12 17L22 12" stroke="#fff" stroke-width="2" stroke-linejoin="round"></path></svg>
                 </div>
             `;
@@ -323,37 +323,37 @@ class ProfilerWidget {
                         </span>
                     </div>
                     <div class="vel-toolbar-panels">
-                        <div class="vel-panel-item${this.currentPanel === 'queries' ? ' selected' : ''}" onclick="velocityDevProfiler.togglePanel('queries')">
+                        <div class="vel-panel-item${this.currentPanel === 'queries' ? ' selected' : ''}" onclick="DevProfiler.togglePanel('queries')">
                             <strong class="vel-panel-count" id="current-queries-count">${database.total_queries || 0}</strong>
                             <span class="vel-panel-label">queries</span>
                             <small class="vel-panel-time" id="current-queries-time">(${database.total_time_formatted || '0ms'})</small>
                         </div>
-                        <div class="vel-panel-item${this.currentPanel === 'performance' ? ' selected' : ''}" onclick="velocityDevProfiler.togglePanel('performance')">
+                        <div class="vel-panel-item${this.currentPanel === 'performance' ? ' selected' : ''}" onclick="DevProfiler.togglePanel('performance')">
                             <strong class="vel-panel-icon">⏱️</strong>
                             <span class="vel-panel-label" id="current-app-time">${performance.application_time || '0ms'}</span>
                             <small class="vel-panel-time">total</small>
                         </div>
-                        <div class="vel-panel-item${this.currentPanel === 'memory' ? ' selected' : ''}" onclick="velocityDevProfiler.togglePanel('memory')">
+                        <div class="vel-panel-item${this.currentPanel === 'memory' ? ' selected' : ''}" onclick="DevProfiler.togglePanel('memory')">
                             <strong class="vel-panel-icon">🧠</strong>
                             <span class="vel-panel-label" id="current-memory-peak">${memory.peak_usage_formatted || '0B'}</span>
                             <small class="vel-panel-time">peak</small>
                         </div>
-                        <div class="vel-panel-item${this.currentPanel === 'request' ? ' selected' : ''}" onclick="velocityDevProfiler.togglePanel('request')">
+                        <div class="vel-panel-item${this.currentPanel === 'request' ? ' selected' : ''}" onclick="DevProfiler.togglePanel('request')">
                             <strong class="vel-panel-icon">🌐</strong>
                             <span class="vel-panel-label" id="current-request-method">${request.method || 'GET'}</span>
                             <small class="vel-panel-time" id="current-request-uri">${this.truncateUrl(request.uri)}</small>
                         </div>
-                        <div class="vel-panel-item${this.currentPanel === 'environment' ? ' selected' : ''}" onclick="velocityDevProfiler.togglePanel('environment')">
+                        <div class="vel-panel-item${this.currentPanel === 'environment' ? ' selected' : ''}" onclick="DevProfiler.togglePanel('environment')">
                             <strong class="vel-panel-icon">🖥️</strong>
                             <span class="vel-panel-label">PHP ${environment.php_version || 'N/A'}</span>
                             <small class="vel-panel-time">env</small>
                         </div>
-                        <div class="vel-panel-item${this.currentPanel === 'opcache' ? ' selected' : ''}" onclick="velocityDevProfiler.togglePanel('opcache')">
+                        <div class="vel-panel-item${this.currentPanel === 'opcache' ? ' selected' : ''}" onclick="DevProfiler.togglePanel('opcache')">
                             <strong class="vel-panel-icon">⚡</strong>
                             <span class="vel-panel-label">${performance.opcache?.enabled ? 'ON' : 'OFF'}</span>
                             <small class="vel-panel-time">opcache</small>
                         </div>
-                        <div class="vel-panel-item${this.currentPanel === 'debug' ? ' selected' : ''}" onclick="velocityDevProfiler.togglePanel('debug')">
+                        <div class="vel-panel-item${this.currentPanel === 'debug' ? ' selected' : ''}" onclick="DevProfiler.togglePanel('debug')">
                             <strong class="vel-panel-icon">🐛</strong>
                             <span class="vel-panel-label">${data.debug_info?.messages?.length || 0}</span>
                             <small class="vel-panel-time">debug</small>
@@ -367,10 +367,10 @@ class ProfilerWidget {
                         </select>
                         <span class="vel-request-badge">${this.requests.length}</span>
                     </div>
-                    <button onclick="velocityDevProfiler.clearAllRequests()" class="vel-btn vel-btn-danger" title="Clear HTTP Requests" aria-label="Clear">
+                    <button onclick="DevProfiler.clearAllRequests()" class="vel-btn vel-btn-danger" title="Clear HTTP Requests" aria-label="Clear">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                     </button>
-                    <button onclick="velocityDevProfiler.toggleCollapse()" class="vel-btn vel-btn-primary" id="toolbar-toggle-btn" title="Collapse Toolbar" aria-label="Collapse">
+                    <button onclick="DevProfiler.toggleCollapse()" class="vel-btn vel-btn-primary" id="toolbar-toggle-btn" title="Collapse Toolbar" aria-label="Collapse">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                     </button>
                 </div>
@@ -380,7 +380,7 @@ class ProfilerWidget {
                 <div id="queries-panel" class="vel-profiler-panel" style="display: none;">
                     <div class="vel-panel-header">
                         <h4>🔵 Database Queries (<span id="panel-queries-count">${database.total_queries || 0}</span>)</h4>
-                        <button class="vel-panel-toggle" onclick="velocityDevProfiler.togglePanelCollapse('queries-panel')">−</button>
+                        <button class="vel-panel-toggle" onclick="DevProfiler.togglePanelCollapse('queries-panel')">−</button>
                     </div>
                     <div class="vel-panel-content" id="queries-content">${this.getQueriesPanel(database)}</div>
                 </div>
@@ -388,7 +388,7 @@ class ProfilerWidget {
                 <div id="performance-panel" class="vel-profiler-panel" style="display: none;">
                     <div class="vel-panel-header">
                         <h4>🟢 Performance Metrics</h4>
-                        <button class="vel-panel-toggle" onclick="velocityDevProfiler.togglePanelCollapse('performance-panel')">−</button>
+                        <button class="vel-panel-toggle" onclick="DevProfiler.togglePanelCollapse('performance-panel')">−</button>
                     </div>
                     <div class="vel-panel-content" id="performance-content">${this.getPerformancePanel(performance, data.timers || [])}</div>
                 </div>
@@ -396,7 +396,7 @@ class ProfilerWidget {
                 <div id="memory-panel" class="vel-profiler-panel" style="display: none;">
                     <div class="vel-panel-header">
                         <h4>🟡 Memory Usage</h4>
-                        <button class="vel-panel-toggle" onclick="velocityDevProfiler.togglePanelCollapse('memory-panel')">−</button>
+                        <button class="vel-panel-toggle" onclick="DevProfiler.togglePanelCollapse('memory-panel')">−</button>
                     </div>
                     <div class="vel-panel-content" id="memory-content">${this.getMemoryPanel(memory)}</div>
                 </div>
@@ -404,7 +404,7 @@ class ProfilerWidget {
                 <div id="request-panel" class="vel-profiler-panel" style="display: none;">
                     <div class="vel-panel-header">
                         <h4>🟣 Request Information</h4>
-                        <button class="vel-panel-toggle" onclick="velocityDevProfiler.togglePanelCollapse('request-panel')">−</button>
+                        <button class="vel-panel-toggle" onclick="DevProfiler.togglePanelCollapse('request-panel')">−</button>
                     </div>
                     <div class="vel-panel-content" id="request-content">${this.getRequestPanel(request)}</div>
                 </div>
@@ -412,7 +412,7 @@ class ProfilerWidget {
                 <div id="environment-panel" class="vel-profiler-panel" style="display: none;">
                     <div class="vel-panel-header">
                         <h4>🖥️ Environment & Configuration</h4>
-                        <button class="vel-panel-toggle" onclick="velocityDevProfiler.togglePanelCollapse('environment-panel')">−</button>
+                        <button class="vel-panel-toggle" onclick="DevProfiler.togglePanelCollapse('environment-panel')">−</button>
                     </div>
                     <div class="vel-panel-content" id="environment-content">${this.getEnvironmentPanel(environment, metadata)}</div>
                 </div>
@@ -420,7 +420,7 @@ class ProfilerWidget {
                 <div id="opcache-panel" class="vel-profiler-panel" style="display: none;">
                     <div class="vel-panel-header">
                         <h4>⚡ OPcache & Server Info</h4>
-                        <button class="vel-panel-toggle" onclick="velocityDevProfiler.togglePanelCollapse('opcache-panel')">−</button>
+                        <button class="vel-panel-toggle" onclick="DevProfiler.togglePanelCollapse('opcache-panel')">−</button>
                     </div>
                     <div class="vel-panel-content" id="opcache-content">${this.getOpcachePanel(performance)}</div>
                 </div>
@@ -428,7 +428,7 @@ class ProfilerWidget {
                 <div id="debug-panel" class="vel-profiler-panel" style="display: none;">
                     <div class="vel-panel-header">
                         <h4>🐛 Debug Information (<span id="panel-debug-count">${data.debug_info?.messages?.length || 0}</span> messages)</h4>
-                        <button class="vel-panel-toggle" onclick="velocityDevProfiler.togglePanelCollapse('debug-panel')">−</button>
+                        <button class="vel-panel-toggle" onclick="DevProfiler.togglePanelCollapse('debug-panel')">−</button>
                     </div>
                     <div class="vel-panel-content" id="debug-content">${this.getDebugPanel(data.debug_info || {})}</div>
                 </div>
@@ -992,7 +992,7 @@ class ProfilerWidget {
             let nodeHtml = `<li class="${liClass}">`;
 
             if (hasChildren) {
-                nodeHtml += '<span class="vel-json-toggler" onclick="velocityDevProfiler.toggleJsonNode(this.parentElement)"></span>';
+                nodeHtml += '<span class="vel-json-toggler" onclick="DevProfiler.toggleJsonNode(this.parentElement)"></span>';
             } else {
                 nodeHtml += '<span class="vel-json-no-toggler"></span>';
             }
@@ -1124,7 +1124,7 @@ class ProfilerWidget {
                     if (responseText) {
                         const responseJson = JSON.parse(responseText);
                         if (responseJson._profiler) {
-                            velocityDevProfiler.addAjaxRequestData(requestInfo, responseJson._profiler);
+                            DevProfiler.addAjaxRequestData(requestInfo, responseJson._profiler);
                         }
                     }
                 } catch (e) {
@@ -1161,7 +1161,7 @@ class ProfilerWidget {
                         try {
                             const responseJson = JSON.parse(responseText);
                             if (responseJson._profiler) {
-                                velocityDevProfiler.addAjaxRequestData(requestInfo, responseJson._profiler);
+                                DevProfiler.addAjaxRequestData(requestInfo, responseJson._profiler);
                             }
                         } catch (e) {
                             // Response is not JSON or doesn't contain profiler data
@@ -1499,4 +1499,4 @@ class ProfilerWidget {
 }
 
 // Initialize global profiler instance
-window.velocityDevProfiler = new ProfilerWidget(); 
+window.DevProfiler = new ProfilerWidget(); 

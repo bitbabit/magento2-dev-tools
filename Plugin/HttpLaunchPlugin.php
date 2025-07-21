@@ -1,17 +1,17 @@
 <?php
 declare(strict_types=1);
 
-namespace VelocityDev\DeveloperTools\Plugin;
+namespace BitBabit\DeveloperTools\Plugin;
 
 use Magento\Framework\App\Http;
 use Magento\Framework\HTTP\PhpEnvironment\Request;
 use Magento\Framework\App\ResourceConnection;
-use VelocityDev\DeveloperTools\Api\ProfilerConfigInterface;
-use VelocityDev\DeveloperTools\Helper\Debug;
+use BitBabit\DeveloperTools\Api\ProfilerConfigInterface;
+use BitBabit\DeveloperTools\Helper\Debug;
 
 /** 
  * HttpLaunchPlugin - Simplified version without session dependencies
- * @package VelocityDev\DeveloperTools\Plugin
+ * @package BitBabit\DeveloperTools\Plugin
  */
 class HttpLaunchPlugin
 {

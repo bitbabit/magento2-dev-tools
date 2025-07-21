@@ -5,17 +5,17 @@
     <!-- Plugin for HTTP launch -->
     <type name="Magento\Framework\App\Http">
         <plugin name="dev_tools_http_launch" 
-                type="VelocityDev\DeveloperTools\Plugin\HttpLaunchPlugin" 
+                type="BitBabit\DeveloperTools\Plugin\HttpLaunchPlugin" 
                 sortOrder="1"/>
     </type>
     
       
     <!-- Interface preferences -->
-    <preference for="VelocityDev\DeveloperTools\Api\ProfilerConfigInterface" 
-                type="VelocityDev\DeveloperTools\Model\Config\ProfilerConfig"/>
+    <preference for="BitBabit\DeveloperTools\Api\ProfilerConfigInterface" 
+                type="BitBabit\DeveloperTools\Model\Config\ProfilerConfig"/>
     
     <!-- Virtual types for different connections -->
-    <virtualType name="VelocityDev\DeveloperTools\Model\ResourceConnection\Read" 
+    <virtualType name="BitBabit\DeveloperTools\Model\ResourceConnection\Read" 
                  type="Magento\Framework\App\ResourceConnection">
         <arguments>
             <argument name="config" xsi:type="object">Magento\Framework\App\DeploymentConfig</argument>
@@ -24,10 +24,10 @@
     <type name="Magento\Framework\Console\CommandListInterface">
     <arguments>
         <argument name="commands" xsi:type="array">
-            <item name="profiler_enable" xsi:type="object">VelocityDev\DeveloperTools\Console\Command\EnableCommand</item>
-            <item name="profiler_disable" xsi:type="object">VelocityDev\DeveloperTools\Console\Command\DisableCommand</item>
-            <item name="profiler_status" xsi:type="object">VelocityDev\DeveloperTools\Console\Command\StatusCommand</item>
-            <item name="profiler_generate_api_key" xsi:type="object">VelocityDev\DeveloperTools\Console\GenerateApiKeyCommand</item>
+            <item name="profiler_enable" xsi:type="object">BitBabit\DeveloperTools\Console\Command\EnableCommand</item>
+            <item name="profiler_disable" xsi:type="object">BitBabit\DeveloperTools\Console\Command\DisableCommand</item>
+            <item name="profiler_status" xsi:type="object">BitBabit\DeveloperTools\Console\Command\StatusCommand</item>
+            <item name="profiler_generate_api_key" xsi:type="object">BitBabit\DeveloperTools\Console\GenerateApiKeyCommand</item>
         </argument>
     </arguments>
 </type>
@@ -50,7 +50,7 @@
 </virtualType>
 
 <!-- Comprehensive Profiler Service -->
-<type name="VelocityDev\DeveloperTools\Service\ComprehensiveProfilerService">
+<type name="BitBabit\DeveloperTools\Service\ComprehensiveProfilerService">
     <arguments>
         <argument name="logger" xsi:type="object">DeveloperToolsLogger</argument>
     </arguments>

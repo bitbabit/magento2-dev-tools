@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace VelocityDev\DeveloperTools\Controller\Adminhtml\Config;
+namespace BitBabit\DeveloperTools\Controller\Adminhtml\Config;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Config\ConfigResource\ConfigInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
-use VelocityDev\DeveloperTools\Api\ProfilerConfigInterface;
+use BitBabit\DeveloperTools\Api\ProfilerConfigInterface;
 
 /**
  * Admin controller to generate API keys
@@ -18,7 +18,7 @@ class GenerateApiKey extends Action
     /**
      * Authorization level
      */
-    public const ADMIN_RESOURCE = 'VelocityDev_DeveloperTools::developer_tools';
+    public const ADMIN_RESOURCE = 'BitBabit_DeveloperTools::developer_tools';
 
     /**
      * @param Context $context

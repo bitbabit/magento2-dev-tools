@@ -1,16 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace VelocityDev\DeveloperTools\Console\Command;
+namespace BitBabit\DeveloperTools\Console\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use VelocityDev\DeveloperTools\Api\ProfilerConfigInterface;
+use BitBabit\DeveloperTools\Api\ProfilerConfigInterface;
 
 /**
  * StatusCommand
- * @package VelocityDev\DeveloperTools\Console\Command
+ * @package BitBabit\DeveloperTools\Console\Command
  */
 class StatusCommand extends Command
 {

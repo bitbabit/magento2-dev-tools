@@ -5,6 +5,6 @@ use Magento\Framework\Component\ComponentRegistrar;
 
 ComponentRegistrar::register(
     ComponentRegistrar::MODULE,
-    'VelocityDev_DeveloperTools',
+    'BitBabit_DeveloperTools',
     __DIR__
 );

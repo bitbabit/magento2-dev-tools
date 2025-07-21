@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace VelocityDev\DeveloperTools\Service;
+namespace BitBabit\DeveloperTools\Service;
 
 use Magento\Framework\Stdlib\CookieManagerInterface;
 use Magento\Framework\Stdlib\Cookie\CookieMetadataFactory;
@@ -11,9 +11,9 @@ use Psr\Log\LoggerInterface;
 
 /**
  * ApiKeyCookieManagerService
- * @package VelocityDev\DeveloperTools\Service
- * @author VelocityDev
- * @copyright 2025 VelocityDev
+ * @package BitBabit\DeveloperTools\Service
+ * @author BitBabit
+ * @copyright 2025 BitBabit
  * @license MIT
  * @version 1.0.0
  */
