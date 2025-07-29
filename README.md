@@ -102,7 +102,7 @@ After installation, follow these steps to get started:
 
 ```bash
 # Enable the profiler
-bin/magento bitbabit:bitbabit:profiler:enable
+bin/magento bitbabit:profiler:enable
 
 # Generate API key for frontend widget
 bin/magento bitbabit:devtools:generate-api-key
