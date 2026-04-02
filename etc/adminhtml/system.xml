@@ -9,7 +9,7 @@
             <class>separator-top</class>    
             <label>Developer Tools</label>
             <tab>bitbabit</tab>
-            <resource>BitBabit_DeveloperTools::developer_tools</resource>
+            <resource>BitBabit_DeveloperTools::devtools_config</resource>
             <group id="dev_tools" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Developer Tools</label>
                 <comment><![CDATA[Configure database query profiling for development and debugging.]]></comment>
@@ -82,50 +82,44 @@
                         <field id="enabled">1</field>
                     </depends>
                 </field>
-            </group>
-            
-            <group id="api_security" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>API Security</label>
-                <comment><![CDATA[Configure API key authentication for secure access to developer tools.]]></comment>
                 
-                <field id="api_key_enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="api_key_enabled" translate="label comment" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable API Key Validation</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment><![CDATA[Require valid X-Debug-Api-Key header for profiler access. <strong>Recommended for production environments.</strong>]]></comment>
                     <depends>
-                        <field id="bitbabitdev_tools/enabled">1</field>
+                        <field id="enabled">1</field>
                     </depends>
                 </field>
                 
-                <field id="api_key" translate="label comment" type="password" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="api_key" translate="label comment" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>API Key</label>
-                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                     <comment><![CDATA[
                         Current API key for X-Debug-Api-Key header validation.<br/>
                         <strong>Generate new key using:</strong> <code>bin/magento bitbabit:devtools:generate-api-key</code><br/>
                         <strong>Regenerate existing key:</strong> <code>bin/magento bitbabit:devtools:generate-api-key --regenerate</code>
                     ]]></comment>
                     <depends>
+                        <field id="enabled">1</field>
                         <field id="api_key_enabled">1</field>
-                        <field id="bitbabitdev_tools/enabled">1</field>
                     </depends>
                 </field>
                 
-                <field id="api_key_info" translate="label comment" type="label" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="api_key_info" translate="label comment" type="label" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Security Notice</label>
                     <comment><![CDATA[
                         <div style="background: #f5f5f5; padding: 10px; border-left: 4px solid #ff6600; margin: 10px 0;">
-                            <strong>⚠️ Important Security Information:</strong><br/>
-                            • API key validation adds an extra layer of security<br/>
-                            • Only requests with the correct X-Debug-Api-Key header will enable profiling<br/>
-                            • Store your API key securely and don't share it publicly<br/>
-                            • Configure your browser extension with the generated API key<br/>
-                            • Regenerate the key periodically for better security
+                            <strong>Important Security Information:</strong><br/>
+                            - API key validation adds an extra layer of security<br/>
+                            - Only requests with the correct X-Debug-Api-Key header will enable profiling<br/>
+                            - Store your API key securely and don't share it publicly<br/>
+                            - Configure your browser extension with the generated API key<br/>
+                            - Regenerate the key periodically for better security
                         </div>
                     ]]></comment>
                     <depends>
+                        <field id="enabled">1</field>
                         <field id="api_key_enabled">1</field>
-                        <field id="bitbabitdev_tools/enabled">1</field>
                     </depends>
                 </field>
             </group>

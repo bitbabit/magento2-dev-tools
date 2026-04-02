@@ -7,54 +7,94 @@ use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\HTTP\PhpEnvironment\Request;
 use Magento\Framework\App\State;
+use Magento\Framework\ObjectManager\ResetAfterRequestInterface;
 use Psr\Log\LoggerInterface;
 use BitBabit\DeveloperTools\Api\ProfilerConfigInterface;
 use BitBabit\DeveloperTools\Model\DebugInfo;
 
 /**
- * ComprehensiveProfilerService
+ * Comprehensive profiler service for collecting request performance data.
+ *
+ * Implements ResetAfterRequestInterface so the Application Server (Swoole)
+ * automatically resets per-request mutable state after each response.
+ *
  * @package BitBabit\DeveloperTools\Service
  */
-class ComprehensiveProfilerService
+class ComprehensiveProfilerService implements ResetAfterRequestInterface
 {
-    /**
-     * @var array
-     */
     private array $timers = [];
-    
-    /**
-     * @var float
-     */
     private float $applicationStartTime;
-    
-    /**
-     * @var array
-     */
-    private array $collectectedData = [];
 
     /**
-     * ComprehensiveProfilerService constructor
+     * Number of query profiles that existed before the current request started.
+     * Used to isolate per-request queries in long-lived processes (Swoole, etc.).
+     */
+    private int $queryProfileOffset = 0;
+
+    private const REDACTED_HEADERS = [
+        'authorization',
+        'cookie',
+        'set-cookie',
+        'x-api-key',
+        'x-debug-api-key',
+        'x-csrf-token',
+        'proxy-authorization',
+    ];
+
+    /**
      * @param ResourceConnection $resourceConnection
      * @param ProfilerConfigInterface $config
      * @param LoggerInterface $logger
      * @param RequestInterface $request
      * @param State $appState
+     * @param DebugInfo $debugInfo
      */
     public function __construct(
         private ResourceConnection $resourceConnection,
         private ProfilerConfigInterface $config,
         private LoggerInterface $logger,
         private RequestInterface $request,
-        private State $appState
+        private State $appState,
+        private DebugInfo $debugInfo
     ) {
-        $this->applicationStartTime = defined('MAGENTO_ROOT') ? $_SERVER['REQUEST_TIME_FLOAT'] : microtime(true);
+        $this->applicationStartTime = microtime(true);
         $this->startTimer('application_boot');
     }
 
     /**
-     * Start timer
+     * @inheritDoc
+     */
+    public function _resetState(): void
+    {
+        $this->timers = [];
+        $this->applicationStartTime = microtime(true);
+        $this->queryProfileOffset = 0;
+    }
+
+    /**
+     * Reset profiler state for a new request.
+     * Must be called at the start of each HTTP request in long-lived processes
+     * (Swoole, RoadRunner, FrankenPHP) where the service instance is reused.
+     */
+    public function resetForNewRequest(): void
+    {
+        $this->applicationStartTime = microtime(true);
+        $this->timers = [];
+        $this->startTimer('application_boot');
+        $this->debugInfo->clear();
+
+        try {
+            $connection = $this->resourceConnection->getConnection();
+            $profiler = $connection->getProfiler();
+            $profiles = $profiler->getQueryProfiles();
+            $this->queryProfileOffset = $profiles ? count($profiles) : 0;
+        } catch (\Exception $e) {
+            $this->queryProfileOffset = 0;
+        }
+    }
+
+    /**
      * @param string $name
-     * @return void
      */
     public function startTimer(string $name): void
     {
@@ -66,9 +106,7 @@ class ComprehensiveProfilerService
     }
 
     /**
-     * End timer
      * @param string $name
-     * @return void
      */
     public function endTimer(string $name): void
     {
@@ -79,49 +117,35 @@ class ComprehensiveProfilerService
     }
 
     /**
-     * Get comprehensive data
      * @return array
      */
     public function getComprehensiveData(): array
     {
         $this->endTimer('application_boot');
-        $debugInfo = DebugInfo::getInstance();
-        $debugInfo->addMessage("test message", 'info', [
-            'timer_name' => 'test',
-            'duration' => 1000,
-            'data' => [
-                'test' => 'test',
-                'test2' => 'test2',
-                'beta' => [
-                    'test3' => 'test3',
-                    'test4' => 'test4'
-                ]
-            ]
-        ]);
+        $databaseData = $this->getDatabaseData();
         return [
-            'overview' => $this->getOverviewData(),
-            'database' => $this->getDatabaseData(),
+            'overview' => $this->getOverviewData($databaseData),
+            'database' => $databaseData,
             'request' => $this->getRequestData(),
             'performance' => $this->getPerformanceData(),
             'memory' => $this->getMemoryData(),
             'environment' => $this->getEnvironmentData(),
             'timers' => $this->getTimersData(),
             'metadata' => $this->getMetadata(),
-            'debug_info' => $this->getDebugInfo()
+            'debug_info' => $this->debugInfo->getData()
         ];
     }
 
     /**
-     * Get overview data
+     * @param array $dbData Pre-computed database data to avoid redundant profiler iteration
      * @return array
      */
-    private function getOverviewData(): array
+    private function getOverviewData(array $dbData): array
     {
-        $dbData = $this->getDatabaseData();
         return [
             'total_queries' => $dbData['total_queries'],
             'total_db_time' => $dbData['total_time_formatted'],
-            'slow_queries_count' => $dbData['slow_queries_count'],
+            'slow_queries_count' => $dbData['slow_queries_count'] ?? 0,
             'application_time' => $this->formatTime($this->getApplicationTime()),
             'memory_peak' => $this->formatBytes(memory_get_peak_usage(true)),
             'status' => $this->getOverallStatus($dbData)
@@ -129,14 +153,13 @@ class ComprehensiveProfilerService
     }
 
     /**
-     * Get database data
      * @return array
      */
     private function getDatabaseData(): array
     {
         $connection = $this->resourceConnection->getConnection();
         $profiler = $connection->getProfiler();
-        
+
         if (!$profiler->getEnabled()) {
             return [
                 'enabled' => false,
@@ -154,7 +177,10 @@ class ComprehensiveProfilerService
 
         $profiles = $profiler->getQueryProfiles();
         if ($profiles) {
-            foreach ($profiles as $profile) {
+            $allProfiles = array_values($profiles);
+            $requestProfiles = array_slice($allProfiles, $this->queryProfileOffset);
+
+            foreach ($requestProfiles as $profile) {
                 $queryTime = $profile->getElapsedSecs();
                 $query = [
                     'query' => $profile->getQuery(),
@@ -182,54 +208,58 @@ class ComprehensiveProfilerService
             'slow_query_threshold' => $slowQueryThreshold * 1000 . ' ms'
         ];
     }
+
     /**
-     * Get request header
-     * @param mixed $header
-     * @return void
+     * @param string $header
+     * @return string|null
      */
-    public function getHeader($header): ?string{
-         /** @var Request $request */
-         $request = $this->request;
+    public function getHeader(string $header): ?string
+    {
+        /** @var Request $request */
+        $request = $this->request;
+        $value = $request->getHeader($header);
 
-         $value = $request->getHeader($header); 
-
-         return $value?$value:null;
+        return $value !== false ? (string) $value : null;
     }
+
     /**
-     * Get request data
      * @return array
      */
     private function getRequestData(): array
     {
         /** @var Request $request */
         $request = $this->request;
-        
+
+        $postData = json_decode($request->getContent() ?? '[]', true);
+        if ($postData === null) {
+            $postData = $request->getPost()->toArray();
+        }
+
         return [
             'method' => $request->getMethod(),
             'uri' => $request->getRequestUri(),
             'url' => $request->getUriString(),
             'ip' => $request->getClientIp(),
-            'user_agent' => $request->getHeader('User-Agent'),
-            'content_type' => $request->getHeader('Content-Type'),
-            'headers' => $this->getRequestHeaders($request),
+            'user_agent' => $request->getHeader('User-Agent') ?: null,
+            'content_type' => $request->getHeader('Content-Type') ?: null,
+            'headers' => $this->getSanitizedHeaders($request),
             'parameters' => [
-                'GET' => $request->getQuery()->toArray(),
-                'POST' => json_decode($request->getContent() ?? "[]",true),
-                'FILES' => $_FILES ?? []
+                'GET' => $this->sanitizeParamArray($request->getQuery()->toArray()),
+                'POST' => $this->sanitizeParamArray(is_array($postData) ? $postData : []),
+                'FILES' => $request->getFiles()->toArray()
             ],
             'session' => $this->getSessionData(),
-            'cookies' => $request->getCookie()
+            'cookies' => '[redacted]'
         ];
     }
 
     /**
-     * Get performance data
      * @return array
      */
     private function getPerformanceData(): array
     {
         $applicationTime = $this->getApplicationTime();
-        
+
         return [
             'application_time' => $this->formatTime($applicationTime),
             'application_time_ms' => round($applicationTime, 2),
@@ -242,7 +272,6 @@ class ComprehensiveProfilerService
     }
 
     /**
-     * Get memory data
      * @return array
      */
     private function getMemoryData(): array
@@ -259,26 +288,27 @@ class ComprehensiveProfilerService
     }
 
     /**
-     * Get environment data
      * @return array
-     */ 
+     */
     private function getEnvironmentData(): array
     {
+        /** @var Request $request */
+        $request = $this->request;
+
         return [
             'php_version' => PHP_VERSION,
-            'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
+            'server_software' => $request->getServer('SERVER_SOFTWARE') ?? 'Unknown',
             'operating_system' => PHP_OS,
             'max_execution_time' => ini_get('max_execution_time'),
             'timezone' => date_default_timezone_get(),
             'locale' => setlocale(LC_ALL, 0),
-            'extensions' => array_slice(get_loaded_extensions(), 0, 20) // Limit to first 20
+            'extensions' => array_slice(get_loaded_extensions(), 0, 20)
         ];
     }
 
     /**
-     * Get timers data
      * @return array
-     */ 
+     */
     private function getTimersData(): array
     {
         $formattedTimers = [];
@@ -294,9 +324,8 @@ class ComprehensiveProfilerService
     }
 
     /**
-     * Get metadata
      * @return array
-     */     
+     */
     private function getMetadata(): array
     {
         return [
@@ -309,42 +338,95 @@ class ComprehensiveProfilerService
     }
 
     /**
-     * Get request headers
      * @param Request $request
      * @return array
      */
-    private function getRequestHeaders(Request $request): array
+    private function getSanitizedHeaders(Request $request): array
     {
         $headers = [];
         foreach ($request->getHeaders() as $header) {
-            $headers[$header->getFieldName()] = $header->getFieldValue();
+            $name = $header->getFieldName();
+            if (in_array(strtolower($name), self::REDACTED_HEADERS, true)) {
+                $headers[$name] = '[redacted]';
+            } else {
+                $headers[$name] = $header->getFieldValue();
+            }
         }
         return $headers;
     }
 
     /**
-     * Get session data
-     * @return array
-     */ 
-    private function getSessionData(): array
+     * Redact obvious secrets from captured GET/POST so profiler JSON/HTML does not leak credentials.
+     *
+     * @param array<string,mixed> $params
+     * @return array<string,mixed>
+     */
+    private function sanitizeParamArray(array $params): array
     {
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            return array_slice($_SESSION ?? [], 0, 10); // Limit session data
+        $needles = [
+            'password',
+            'passwd',
+            'token',
+            'secret',
+            'api_key',
+            'apikey',
+            'credit_card',
+            'cvv',
+            'authorization',
+        ];
+        $out = [];
+        foreach ($params as $key => $value) {
+            $lower = strtolower((string) $key);
+            $sensitive = false;
+            foreach ($needles as $n) {
+                if (str_contains($lower, $n)) {
+                    $sensitive = true;
+                    break;
+                }
+            }
+            if ($sensitive) {
+                $out[$key] = '[redacted]';
+            } elseif (is_array($value)) {
+                $out[$key] = $this->sanitizeParamArray($value);
+            } else {
+                $out[$key] = $value;
+            }
         }
-        return ['status' => 'No active session'];
+        return $out;
     }
 
     /**
-     * Get application time
-     * @return float
+     * Retrieve a limited snapshot of session data via the request's DI-managed
+     * server params rather than the $_SESSION superglobal.
+     *
+     * @return array
+     */
+    private function getSessionData(): array
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            return ['status' => 'No active session'];
+        }
+
+        try {
+            $sessionId = session_id();
+            return [
+                'status' => 'active',
+                'id_prefix' => $sessionId ? substr($sessionId, 0, 8) . '...' : null,
+            ];
+        } catch (\Exception $e) {
+            return ['status' => 'Error reading session'];
+        }
+    }
+
+    /**
+     * @return float milliseconds
      */
     private function getApplicationTime(): float
     {
-        return (microtime(true) - $this->applicationStartTime) * 1000; // Convert to milliseconds
+        return (microtime(true) - $this->applicationStartTime) * 1000;
     }
 
     /**
-     * Get bootstrap time
      * @return string
      */
     private function getBootstrapTime(): string
@@ -354,7 +436,6 @@ class ComprehensiveProfilerService
     }
 
     /**
-     * Get opcache status
      * @return array
      */
     private function getOpcacheStatus(): array
@@ -364,7 +445,7 @@ class ComprehensiveProfilerService
             return [
                 'enabled' => $status !== false,
                 'memory_usage' => $status['memory_usage'] ?? null,
-                'hit_rate' => isset($status['opcache_statistics']) ? 
+                'hit_rate' => isset($status['opcache_statistics']) ?
                     round($status['opcache_statistics']['opcache_hit_rate'], 2) : null
             ];
         }
@@ -372,20 +453,18 @@ class ComprehensiveProfilerService
     }
 
     /**
-     * Get overall status
-     * 
+     * @param array $dbData
      * @return string
      */
-    private function getOverallStatus($dbData): string
+    private function getOverallStatus(array $dbData): string
     {
         if ($dbData['slow_queries_count'] > 5) return 'warning';
         if ($dbData['total_queries'] > 100) return 'warning';
-        
+
         return 'good';
     }
 
     /**
-     * Check if memory limit is exceeded
      * @return bool
      */
     private function isMemoryLimitExceeded(): bool
@@ -395,25 +474,13 @@ class ComprehensiveProfilerService
     }
 
     /**
-     * Format query
-     * @param string $query
-     * @return string
-     */
-    private function formatQuery(string $query): string
-    {
-        // Truncate very long queries and format them
-        return strlen($query) > 200 ? substr($query, 0, 200) . '...' : $query;
-    }
-
-    /**
-     * Get query type
      * @param string $query
      * @return string
      */
     private function getQueryType(string $query): string
     {
         $query = trim(strtoupper($query));
-        
+
         if (str_starts_with($query, 'SELECT')) {
             return 'SELECT';
         } elseif (str_starts_with($query, 'INSERT')) {
@@ -434,7 +501,6 @@ class ComprehensiveProfilerService
     }
 
     /**
-     * Format time
      * @param float $milliseconds
      * @return string
      */
@@ -450,7 +516,6 @@ class ComprehensiveProfilerService
     }
 
     /**
-     * Format bytes
      * @param int $bytes
      * @return string
      */
@@ -463,14 +528,4 @@ class ComprehensiveProfilerService
         $bytes /= pow(1024, $pow);
         return round($bytes, 2) . ' ' . $units[$pow];
     }
-
-    /**
-     * Get debug info
-     * @return array
-     */
-    private function getDebugInfo(): array
-    {
-        $debugInfo = DebugInfo::getInstance();
-        return $debugInfo->getData();
-    }
-} 
+}

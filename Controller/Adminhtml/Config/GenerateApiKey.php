@@ -18,7 +18,7 @@ class GenerateApiKey extends Action
     /**
      * Authorization level
      */
-    public const ADMIN_RESOURCE = 'BitBabit_DeveloperTools::developer_tools';
+    public const ADMIN_RESOURCE = 'BitBabit_DeveloperTools::devtools_api_key';
 
     /**
      * @param Context $context

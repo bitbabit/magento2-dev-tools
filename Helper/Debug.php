@@ -4,26 +4,38 @@ declare(strict_types=1);
 namespace BitBabit\DeveloperTools\Helper;
 
 use BitBabit\DeveloperTools\Model\DebugInfo;
+use Magento\Framework\App\ObjectManager;
 
 /**
- * Debug helper for easy access to DebugInfo singleton
+ * Static debug helper that bridges to the DI-managed DebugInfo service.
+ *
+ * Uses ObjectManager internally so the static API (Debug::info(), etc.)
+ * resolves the same shared DebugInfo instance that the Application Server
+ * resets via ResetAfterRequestInterface after each request.
+ *
  * @package BitBabit\DeveloperTools\Helper
  */
 class Debug
 {
     /**
-     * Add a debug message
+     * @return DebugInfo
+     */
+    private static function getDebugInfo(): DebugInfo
+    {
+        return ObjectManager::getInstance()->get(DebugInfo::class);
+    }
+
+    /**
      * @param string $message
      * @param string $level
      * @param array $context
      */
     public static function log(string $message, string $level = 'info', array $context = []): void
     {
-        DebugInfo::getInstance()->addMessage($message, $level, $context);
+        self::getDebugInfo()->addMessage($message, $level, $context);
     }
 
     /**
-     * Add an info message
      * @param string $message
      * @param array $context
      */
@@ -33,7 +45,6 @@ class Debug
     }
 
     /**
-     * Add a warning message
      * @param string $message
      * @param array $context
      */
@@ -43,7 +54,6 @@ class Debug
     }
 
     /**
-     * Add an error message
      * @param string $message
      * @param array $context
      */
@@ -52,34 +62,25 @@ class Debug
         self::log($message, 'error', $context);
     }
 
-
-
     /**
-     * Start a timer (legacy method - currently disabled)
      * @param string $name
      */
     public static function startTimer(string $name): void
     {
-        // Timer functionality removed for simplicity
-        // Use regular debug messages with timestamps instead
         self::info("Timer started: {$name}", ['timer_name' => $name, 'action' => 'start']);
     }
 
     /**
-     * End a timer (legacy method - currently disabled)
      * @param string $name
      * @param string $message
      */
     public static function endTimer(string $name, string $message = ''): void
     {
-        // Timer functionality removed for simplicity
-        // Use regular debug messages with timestamps instead
         $msg = $message ?: "Timer ended: {$name}";
         self::info($msg, ['timer_name' => $name, 'action' => 'end']);
     }
 
     /**
-     * Dump variable as debug message
      * @param mixed $var
      * @param string $label
      */
@@ -87,4 +88,4 @@ class Debug
     {
         self::log($label, 'dump', ['data' => $var]);
     }
-} 
+}

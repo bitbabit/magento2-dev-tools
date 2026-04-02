@@ -32,8 +32,8 @@ class DisableCommand extends Command
      */
     protected function configure(): void
     {
-        $this->setName('profiler:disable')
-             ->setDescription('Disable DB Profiler');
+        $this->setName('bitbabit:devtools:disable')
+             ->setDescription('Disable BitBabit Developer Tools profiler');
     }
 
     /**

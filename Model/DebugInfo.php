@@ -3,25 +3,19 @@ declare(strict_types=1);
 
 namespace BitBabit\DeveloperTools\Model;
 
+use Magento\Framework\ObjectManager\ResetAfterRequestInterface;
+
 /**
- * DebugInfo singleton class for collecting debug messages
+ * DI-managed service for collecting debug messages.
+ *
+ * Implements ResetAfterRequestInterface so the Application Server (Swoole)
+ * automatically clears per-request messages after each response.
+ *
  * @package BitBabit\DeveloperTools\Model
  */
-class DebugInfo
+class DebugInfo implements ResetAfterRequestInterface
 {
-    private static ?DebugInfo $instance = null;
     private array $messages = [];
-
-
-    private function __construct() {}
-
-    public static function getInstance(): self
-    {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
 
     /**
      * Add a debug message
@@ -39,18 +33,13 @@ class DebugInfo
         ];
     }
 
-
-
     /**
-     * Get all debug messages
      * @return array
      */
     public function getMessages(): array
     {
         return $this->messages;
     }
-
-
 
     /**
      * Clear all messages
@@ -61,7 +50,6 @@ class DebugInfo
     }
 
     /**
-     * Get messages as JSON
      * @return string
      */
     public function getMessagesAsJson(): string
@@ -80,12 +68,11 @@ class DebugInfo
         ];
     }
 
-
-
-    // Prevent cloning and unserialization
-    private function __clone() {}
-    public function __wakeup()
+    /**
+     * @inheritDoc
+     */
+    public function _resetState(): void
     {
-        throw new \Exception("Cannot unserialize singleton");
+        $this->messages = [];
     }
-} 
+}

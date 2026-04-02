@@ -13,6 +13,7 @@ use Magento\Framework\Locale\ResolverInterface as LocaleResolver;
 use Magento\Store\Model\StoreManagerInterface;
 use BitBabit\DeveloperTools\Api\ProfilerConfigInterface;
 use BitBabit\DeveloperTools\Service\ComprehensiveProfilerService;
+use BitBabit\DeveloperTools\Service\SsrLogStorageService;
 use Magento\Framework\App\ResourceConnection;
 use BitBabit\DeveloperTools\Service\ApiKeyCookieManagerService;
 
@@ -33,6 +34,7 @@ class ResponseObserver implements ObserverInterface
      * @param StoreManagerInterface $storeManager
      * @param ResourceConnection $resourceConnection
      * @param ApiKeyCookieManagerService $cookieManagerService
+     * @param SsrLogStorageService $ssrLogStorage
      */
     public function __construct(
         private ProfilerConfigInterface $config,
@@ -43,7 +45,8 @@ class ResponseObserver implements ObserverInterface
         private LocaleResolver $localeResolver,
         private StoreManagerInterface $storeManager,
         private ResourceConnection $resourceConnection,
-        private ApiKeyCookieManagerService $cookieManagerService
+        private ApiKeyCookieManagerService $cookieManagerService,
+        private SsrLogStorageService $ssrLogStorage
     ) {
     }
 
@@ -54,8 +57,6 @@ class ResponseObserver implements ObserverInterface
      */
     public function execute(Observer $observer): void
     {
-        // In your module's observer or plugin        
-        // Early exit if profiler is not available or enabled
         $connection = $this->resourceConnection->getConnection();
         $profiler = $connection->getProfiler();
         if (!$profiler->getEnabled()) {
@@ -64,6 +65,10 @@ class ResponseObserver implements ObserverInterface
 
         /** @var Response $response */
         $response = $observer->getData('response');
+        $ssrId = $this->comprehensiveProfiler->getHeader('X-SSR-ID');
+        if ($ssrId && $this->ssrLogStorage->isValidSsrId($ssrId)) {
+            $response->setHeader('X-SSR-ID', $ssrId);
+        }
         $contentType = $this->getContentType();
         // Early exit if no valid content type or injection is disabled
         if (!$this->shouldInjectProfilerData($contentType)) {
@@ -73,6 +78,7 @@ class ResponseObserver implements ObserverInterface
         $this->setProfilerCookies();
 
         $comprehensiveData = $this->comprehensiveProfiler->getComprehensiveData();
+        $this->storeSsrProfilerData($comprehensiveData);
 
         if ($this->isJsonResponse($contentType)) {
             $response->setHeader('X-Debug-Mode', 'true');
@@ -318,20 +324,28 @@ class ResponseObserver implements ObserverInterface
     }
 
     /**
-     * Convert header value to string or null
-     * @param mixed $header
-     * @return string|null
+     * Persist profiler payload for SSR flows when X-SSR-ID is present.
+     *
+     * @param array $profilerData
+     * @return void
      */
-    private function headerToString($header): ?string
+    private function storeSsrProfilerData(array $profilerData): void
     {
-        if (!$header) {
-            return null;
+        $ssrId = $this->comprehensiveProfiler->getHeader('X-SSR-ID');
+        if (!$ssrId || !$this->ssrLogStorage->isValidSsrId($ssrId)) {
+            return;
         }
-        if (is_object($header) && method_exists($header, 'toString')) {
-            $str = $header->toString();
-        } else {
-            $str = (string) $header;
-        }
-        return $str === '' ? null : $str;
+
+        $entry = [
+            'captured_at' => gmdate('c'),
+            'request' => [
+                'method' => $profilerData['request']['method'] ?? null,
+                'uri' => $profilerData['request']['uri'] ?? null,
+            ],
+            'profiler_data' => $profilerData,
+        ];
+
+        $this->ssrLogStorage->append($ssrId, $entry);
     }
+
 }
