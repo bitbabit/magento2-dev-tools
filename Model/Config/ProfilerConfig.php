@@ -9,6 +9,7 @@ use Magento\Framework\HTTP\PhpEnvironment\Request;
 use Magento\Framework\Math\Random;
 use BitBabit\DeveloperTools\Api\ProfilerConfigInterface;
 use BitBabit\DeveloperTools\Service\ApiKeyCookieManagerService;
+use Psr\Log\LoggerInterface;
 
 /**
  * ProfilerConfig
@@ -22,12 +23,14 @@ class ProfilerConfig implements ProfilerConfigInterface
      * @param State $appState
      * @param Random $mathRandom
      * @param ApiKeyCookieManagerService $cookieManagerService
+     * @param LoggerInterface $logger
      */
     public function __construct(
         private ScopeConfigInterface $scopeConfig,
         private State $appState,
         private Random $mathRandom,
-        private ApiKeyCookieManagerService $cookieManagerService
+        private ApiKeyCookieManagerService $cookieManagerService,
+        private LoggerInterface $logger
     ) {}
     
     /**
@@ -75,7 +78,12 @@ class ProfilerConfig implements ProfilerConfigInterface
     {
         return $this->scopeConfig->isSetFlag(self::XML_PATH_LOG_TO_FILE);
     }
-    
+
+    public function isDebugLoggingEnabled(): bool
+    {
+        return $this->isEnabled() && $this->isLogToFileEnabled();
+    }
+
     /**
      * isDeveloperModeOnly
      * @return bool
@@ -184,22 +192,124 @@ class ProfilerConfig implements ProfilerConfigInterface
         }
     }
 
-    /**
-     * Should enable profiler request
-     * @param Request $request
-     * @return bool
-     */
     public function shouldProfileRequest(Request $request): bool
     {
-        // Check all false conditions first
-        if (!$this->isEnabled() || 
-            ($this->isDeveloperModeOnly() && $this->appState->getMode() !== State::MODE_DEVELOPER) ||
-            !$this->validateApiKey($request)) {
-            return false;
-        }
-        // Return true if show without header key, or if profiler header is present
-        return true;
+        return $this->getProfilingGateResult($request)['allowed'];
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getProfilingGateResult(Request $request): array
+    {
+        $headerStatus = $this->buildHeaderStatus($request);
 
+        if (!$this->isEnabled()) {
+            $this->logGate('deny', ['reason' => 'module_disabled']);
+
+            return $this->denyResult('module_disabled', [], $headerStatus, false);
+        }
+
+        if ($this->isDeveloperModeOnly() && $this->appState->getMode() !== State::MODE_DEVELOPER) {
+            $this->logGate('deny', ['reason' => 'developer_mode_required']);
+
+            return $this->denyResult('developer_mode_required', [], $headerStatus, false);
+        }
+
+        if (!$this->validateApiKey($request)) {
+            $missing = $this->isApiKeyEnabled() ? [self::API_KEY_HEADER] : [];
+            $this->logGate('deny', [
+                'reason' => 'api_key',
+                'api_key_validation_enabled' => $this->isApiKeyEnabled(),
+                'configured_key_present' => $this->getApiKey() !== null,
+                'missing_headers' => $missing,
+            ]);
+
+            return $this->denyResult('api_key', $missing, $headerStatus, true);
+        }
+
+        $headerKey = $this->getProfilerHeaderKey();
+        $headerValue = $request->getHeader($headerKey);
+        if ($headerValue === false) {
+            $this->logGate('deny', ['reason' => 'profiler_header_missing', 'header' => $headerKey]);
+
+            return $this->denyResult('profiler_header_missing', [$headerKey], $headerStatus, true);
+        }
+
+        $headerValue = trim((string) $headerValue);
+        if ($headerValue === '') {
+            $this->logGate('deny', ['reason' => 'profiler_header_empty', 'header' => $headerKey]);
+
+            return $this->denyResult('profiler_header_empty', [$headerKey], $headerStatus, true);
+        }
+
+        $this->logGate('allow', ['profiler_trigger_header' => $headerKey]);
+
+        return [
+            'allowed' => true,
+            'reason' => null,
+            'missing_headers' => [],
+            'header_status' => $headerStatus,
+            'should_log_request_headers' => false,
+        ];
+    }
+
+    /**
+     * @return array<string, string> present|missing|empty
+     */
+    private function buildHeaderStatus(Request $request): array
+    {
+        $names = array_unique([
+            $this->getProfilerHeaderKey(),
+            self::API_KEY_HEADER,
+            'X-SSR-ID',
+            'X-SSR-Source',
+        ]);
+        $status = [];
+        foreach ($names as $name) {
+            $value = $request->getHeader($name);
+            if ($value === false) {
+                $status[$name] = 'missing';
+            } elseif (trim((string) $value) === '') {
+                $status[$name] = 'empty';
+            } else {
+                $status[$name] = 'present';
+            }
+        }
+
+        return $status;
+    }
+
+    /**
+     * @param list<string> $missingHeaders
+     * @param array<string, string> $headerStatus
+     * @return array<string, mixed>
+     */
+    private function denyResult(
+        string $reason,
+        array $missingHeaders,
+        array $headerStatus,
+        bool $logRequestHeaders
+    ): array {
+        return [
+            'allowed' => false,
+            'reason' => $reason,
+            'missing_headers' => $missingHeaders,
+            'header_status' => $headerStatus,
+            'should_log_request_headers' => $logRequestHeaders && $this->isDebugLoggingEnabled(),
+        ];
+    }
+
+    /**
+     * @param string $outcome allow|deny
+     * @param array<string, mixed> $context
+     */
+    private function logGate(string $outcome, array $context = []): void
+    {
+        if (!$this->isDebugLoggingEnabled()) {
+            return;
+        }
+
+        $this->logger->debug('Profiler gate: ' . $outcome, $context);
+    }
 }

@@ -109,6 +109,11 @@ interface ProfilerConfigInterface
     public function isLogToFileEnabled(): bool;
 
     /**
+     * Admin: module enabled and "Log debug messages to file" is on.
+     */
+    public function isDebugLoggingEnabled(): bool;
+
+    /**
      * Check if the developer mode only is enabled
      */
     public function isDeveloperModeOnly(): bool;
@@ -152,4 +157,17 @@ interface ProfilerConfigInterface
      * Check if the request should be profiled
      */
     public function shouldProfileRequest(\Magento\Framework\HTTP\PhpEnvironment\Request $request): bool;
+
+    /**
+     * Profiling gate outcome for the request (used for diagnostics when headers are missing).
+     *
+     * @return array{
+     *     allowed: bool,
+     *     reason: string|null,
+     *     missing_headers: list<string>,
+     *     header_status: array<string, string>,
+     *     should_log_request_headers: bool
+     * }
+     */
+    public function getProfilingGateResult(\Magento\Framework\HTTP\PhpEnvironment\Request $request): array;
 }

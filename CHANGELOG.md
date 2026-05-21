@@ -7,12 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.3] - 2026-05-21
+
 ### Added
+- Admin toggle **Log Debug Messages to File** (`bitbabit/dev_tools/log_to_file_enabled`)
+- `DebugLogger` service: debug output only when Developer Tools and file logging are enabled
+- `getProfilingGateResult()` for profiling gate diagnostics
+- Log all sanitized request headers when module is enabled but required profiler/API headers are missing
+
 ### Changed
-### Deprecated
-### Removed
+- Removed temporary `BITBABIT_DEVTOOLS_SSR_DUMP` / `BITBABIT_DEVTOOLS_GATE_DUMP` env dumps
+- `HttpLaunchPlugin` uses `DebugLogger` instead of per-request `Debug::` noise
+- Cookie and gate logging gated by admin debug logging setting
+- `Helper\Debug` delegates to injectable `DebugLogger`
+
 ### Fixed
-### Security
+- Unused profiler file logger wiring cleaned up in `di.xml`
 
 ## [1.2.0] - 2025-07-21
 

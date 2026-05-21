@@ -32,7 +32,7 @@ class EnableCommand extends Command
     */
     protected function configure(): void
     {
-        $this->setName('bitbabit:devtools:enable')
+        $this->setName('bitbabit:profiler:enable')
              ->setDescription('Enable BitBabit Developer Tools profiler with default configuration');
     }
 

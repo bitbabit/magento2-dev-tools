@@ -58,8 +58,19 @@
     </arguments>
 </virtualType>
 
-<!-- Comprehensive Profiler Service -->
-<type name="BitBabit\DeveloperTools\Service\ComprehensiveProfilerService">
+<type name="BitBabit\DeveloperTools\Service\DebugLogger">
+    <arguments>
+        <argument name="logger" xsi:type="object">DeveloperToolsLogger</argument>
+    </arguments>
+</type>
+
+<type name="BitBabit\DeveloperTools\Model\Config\ProfilerConfig">
+    <arguments>
+        <argument name="logger" xsi:type="object">DeveloperToolsLogger</argument>
+    </arguments>
+</type>
+
+<type name="BitBabit\DeveloperTools\Service\ApiKeyCookieManagerService">
     <arguments>
         <argument name="logger" xsi:type="object">DeveloperToolsLogger</argument>
     </arguments>

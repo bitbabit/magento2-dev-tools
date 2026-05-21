@@ -12,6 +12,7 @@ use Magento\Framework\Math\Random;
 use BitBabit\DeveloperTools\Model\Config\ProfilerConfig;
 use BitBabit\DeveloperTools\Api\ProfilerConfigInterface;
 use BitBabit\DeveloperTools\Service\ApiKeyCookieManagerService;
+use Psr\Log\LoggerInterface;
 
 /**
  * Test class for ProfilerConfig
@@ -64,7 +65,8 @@ class ProfilerConfigTest extends TestCase
             $this->scopeConfig,
             $this->appState,
             $this->mathRandom,
-            $this->cookieManagerService
+            $this->cookieManagerService,
+            $this->createMock(LoggerInterface::class)
         );
     }
 
@@ -166,6 +168,18 @@ class ProfilerConfigTest extends TestCase
 
         $result = $this->profilerConfig->isLogToFileEnabled();
         $this->assertTrue($result);
+    }
+
+    public function testIsDebugLoggingEnabled(): void
+    {
+        $this->scopeConfig->expects($this->exactly(2))
+            ->method('isSetFlag')
+            ->willReturnMap([
+                [ProfilerConfigInterface::XML_PATH_ENABLED, null, null, null, true],
+                [ProfilerConfigInterface::XML_PATH_LOG_TO_FILE, null, null, null, true],
+            ]);
+
+        $this->assertTrue($this->profilerConfig->isDebugLoggingEnabled());
     }
 
     /**

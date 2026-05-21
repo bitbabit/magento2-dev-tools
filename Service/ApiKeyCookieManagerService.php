@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BitBabit\DeveloperTools\Service;
 
+use BitBabit\DeveloperTools\Api\ProfilerConfigInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Stdlib\CookieManagerInterface;
 use Magento\Framework\Stdlib\Cookie\CookieMetadataFactory;
 use Magento\Framework\HTTP\PhpEnvironment\Request;
@@ -30,12 +32,14 @@ class ApiKeyCookieManagerService
      * @param CookieManagerInterface $cookieManager
      * @param CookieMetadataFactory $cookieMetadataFactory
      * @param Request $request
+     * @param ScopeConfigInterface $scopeConfig
      * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly CookieManagerInterface $cookieManager,
         private readonly CookieMetadataFactory $cookieMetadataFactory,
         private readonly Request $request,
+        private readonly ScopeConfigInterface $scopeConfig,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -49,7 +53,7 @@ class ApiKeyCookieManagerService
         try {
             return $this->cookieManager->getCookie(self::API_KEY_COOKIE_NAME);
         } catch (\Exception $e) {
-            $this->logger->error('Failed to get API key cookie', [
+            $this->logError('Failed to get API key cookie', [
                 'error' => $e->getMessage()
             ]);
             return null;
@@ -77,7 +81,7 @@ class ApiKeyCookieManagerService
             // Set the cookie
             $this->cookieManager->setPublicCookie(self::API_KEY_COOKIE_NAME, $value, $metadata);
             
-            $this->logger->debug('API key cookie set successfully', [
+            $this->logDebug('API key cookie set successfully', [
                 'cookie_name' => self::API_KEY_COOKIE_NAME,
                 'secure' => $this->isSecureConnection(),
                 'duration' => self::API_KEY_COOKIE_DURATION
@@ -86,7 +90,7 @@ class ApiKeyCookieManagerService
             return true;
             
         } catch (\Exception $e) {
-            $this->logger->error('Failed to set API key cookie', [
+            $this->logError('Failed to set API key cookie', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -111,14 +115,14 @@ class ApiKeyCookieManagerService
             // Delete the cookie
             $this->cookieManager->deleteCookie($cookieName, $metadata);
             
-            $this->logger->debug('Cookie deleted successfully', [
+            $this->logDebug('Cookie deleted successfully', [
                 'cookie_name' => $cookieName
             ]);
             
             return true;
             
         } catch (\Exception $e) {
-            $this->logger->error('Failed to delete cookie', [
+            $this->logError('Failed to delete cookie', [
                 'cookie_name' => $name ?? self::API_KEY_COOKIE_NAME,
                 'error' => $e->getMessage()
             ]);
@@ -134,20 +138,20 @@ class ApiKeyCookieManagerService
     public function validate(?string $expectedApiKey): bool
     {
         if (!$expectedApiKey) {
-            $this->logger->warning('No expected API key provided for validation');
+            $this->logWarning('No expected API key provided for validation');
             return false;
         }
 
         $cookieValue = $this->get();
         if (!$cookieValue) {
-            $this->logger->debug('No API key cookie found for validation');
+            $this->logDebug('No API key cookie found for validation');
             return false;
         }
 
         // Use hash_equals to prevent timing attacks
         $isValid = hash_equals($expectedApiKey, $cookieValue);
         
-        $this->logger->debug('API key validation result', [
+        $this->logDebug('API key validation result', [
             'is_valid' => $isValid
         ]);
         
@@ -201,14 +205,14 @@ class ApiKeyCookieManagerService
             
             $this->cookieManager->setPublicCookie(self::API_KEY_COOKIE_NAME, $value, $metadata);
             
-            $this->logger->debug('API key cookie set with custom options', [
+            $this->logDebug('API key cookie set with custom options', [
                 'options' => $options
             ]);
             
             return true;
             
         } catch (\Exception $e) {
-            $this->logger->error('Failed to set API key cookie with custom options', [
+            $this->logError('Failed to set API key cookie with custom options', [
                 'options' => $options,
                 'error' => $e->getMessage()
             ]);
@@ -244,6 +248,33 @@ class ApiKeyCookieManagerService
         }
         
         return false;
+    }
+
+    private function isDebugLoggingEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(ProfilerConfigInterface::XML_PATH_ENABLED)
+            && $this->scopeConfig->isSetFlag(ProfilerConfigInterface::XML_PATH_LOG_TO_FILE);
+    }
+
+    private function logDebug(string $message, array $context = []): void
+    {
+        if ($this->isDebugLoggingEnabled()) {
+            $this->logger->debug($message, $context);
+        }
+    }
+
+    private function logWarning(string $message, array $context = []): void
+    {
+        if ($this->isDebugLoggingEnabled()) {
+            $this->logger->warning($message, $context);
+        }
+    }
+
+    private function logError(string $message, array $context = []): void
+    {
+        if ($this->isDebugLoggingEnabled()) {
+            $this->logger->error($message, $context);
+        }
     }
 
     /**

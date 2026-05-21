@@ -31,8 +31,8 @@ class StatusCommand extends Command
      */
     protected function configure(): void
     {
-        $this->setName('bitbabit:devtools:status')
-             ->setDescription('Show BitBabit Developer Tools profiler status and configuration');
+        $this->setName('profiler:status')
+             ->setDescription('Show DB Profiler status and configuration');
     }
     
     /**
@@ -43,28 +43,19 @@ class StatusCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $output->writeln('<info>BitBabit Developer Tools Status</info>');
-        $output->writeln('================================');
-        $output->writeln('');
-        $output->writeln('<comment>General:</comment>');
-        $output->writeln('  Enabled:              ' . ($this->config->isEnabled() ? '<info>Yes</info>' : '<error>No</error>'));
-        $output->writeln('  Header Key:           ' . $this->config->getProfilerHeaderKey());
-        $output->writeln('  Developer Mode Only:  ' . ($this->config->isDeveloperModeOnly() ? 'Yes' : 'No'));
-        $output->writeln('');
-        $output->writeln('<comment>Output:</comment>');
-        $output->writeln('  HTML Output:          ' . ($this->config->isHtmlOutputEnabled() ? 'Yes' : 'No'));
-        $output->writeln('  JSON Injection:       ' . ($this->config->isJsonInjectionEnabled() ? 'Yes' : 'No'));
-        $output->writeln('  Log to File:          ' . ($this->config->isLogToFileEnabled() ? 'Yes' : 'No'));
-        $output->writeln('  Toolbar Widget:       ' . ($this->config->isToolbarWidgetEnabled() ? 'Yes' : 'No'));
-        $output->writeln('');
-        $output->writeln('<comment>Thresholds:</comment>');
-        $output->writeln('  Slow Query Threshold: ' . $this->config->getSlowQueryThreshold() . 'ms');
-        $output->writeln('  Memory Limit:         ' . $this->config->getMemoryLimitMb() . 'MB');
-        $output->writeln('  Current Memory Usage: ' . round(memory_get_usage(true) / 1024 / 1024, 2) . 'MB');
-        $output->writeln('');
-        $output->writeln('<comment>API Security:</comment>');
-        $output->writeln('  API Key Validation:   ' . ($this->config->isApiKeyEnabled() ? '<info>Enabled</info>' : '<error>Disabled</error>'));
-        $output->writeln('  API Key Configured:   ' . ($this->config->getApiKey() ? '<info>Yes</info>' : '<error>No</error>'));
+        $output->writeln('<info>DB Profiler Status</info>');
+        $output->writeln('==================');
+        $output->writeln('Enabled: ' . ($this->config->isEnabled() ? 'Yes' : 'No'));
+        $output->writeln('Header Key: ' . $this->config->getProfilerHeaderKey());
+        $output->writeln('HTML Output: ' . ($this->config->isHtmlOutputEnabled() ? 'Yes' : 'No'));
+        $output->writeln('JSON Injection: ' . ($this->config->isJsonInjectionEnabled() ? 'Yes' : 'No'));
+        $output->writeln('Log to File: ' . ($this->config->isLogToFileEnabled() ? 'Yes' : 'No'));
+        $output->writeln('Debug Logging Active: ' . ($this->config->isDebugLoggingEnabled() ? 'Yes' : 'No'));
+        $output->writeln('Developer Mode Only: ' . ($this->config->isDeveloperModeOnly() ? 'Yes' : 'No'));
+        $output->writeln('Slow Query Threshold: ' . $this->config->getSlowQueryThreshold() . 'ms');
+        $output->writeln('Toolbar Widget: ' . ($this->config->isToolbarWidgetEnabled() ? 'Yes' : 'No'));
+        $output->writeln('Memory Limit: ' . $this->config->getMemoryLimitMb() . 'MB');
+        $output->writeln('Current Memory Usage: ' . round(memory_get_usage(true) / 1024 / 1024, 2) . 'MB');
         
         return Command::SUCCESS;
     }

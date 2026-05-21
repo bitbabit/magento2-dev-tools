@@ -102,7 +102,7 @@ After installation, follow these steps to get started:
 
 ```bash
 # Enable the profiler
-bin/magento bitbabit:devtools:enable
+bin/magento bitbabit:bitbabit:profiler:enable
 
 # Generate API key for frontend widget
 bin/magento bitbabit:devtools:generate-api-key
@@ -153,13 +153,13 @@ Navigate to **Stores → Configuration → BitBabit → Developer Tools**
 #### Enable/Disable Profiler
 ```bash
 # Enable profiler
-bin/magento bitbabit:devtools:enable
+bin/magento bitbabit:profiler:enable
 
 # Disable profiler  
-bin/magento bitbabit:devtools:disable
+bin/magento bitbabit:profiler:disable
 
 # Check status
-bin/magento bitbabit:devtools:status
+bin/magento bitbabit:profiler:status
 ```
 
 #### API Key Management
@@ -193,64 +193,6 @@ headers: {
   'X-Debug-Api-Key': 'your-generated-api-key'
 }
 ```
-
-### Next.js SSR & npm companion (`@bitbabit/devtools-ssr-bridge`)
-
-For **server-side** calls from Next.js (or Node) to Magento, use the published npm package so the same debug headers are added to `fetch()` (and optionally axios) as in the browser:
-
-- **npm:** [`@bitbabit/devtools-ssr-bridge`](https://www.npmjs.com/package/@bitbabit/devtools-ssr-bridge)
-- **Install:** `npm i @bitbabit/devtools-ssr-bridge`
-- **What it does:** patches global `fetch`, optional axios interceptors, middleware correlation, and reads config from the `__devtools_config` cookie (written by the Chrome extension) or from environment variables on the Node process.
-- **Chrome extension:** Install the **Magento Developer Tools Profiler** extension on your storefront / Next origin so it can set that cookie (API key, paths, custom headers). Without the cookie or env fallback, the bridge does not inject headers.
-- **Env fallback (CI / no extension):** on the Node process set `MAGENTO_DEVTOOLS_ENABLED=true` and `MAGENTO_DEVTOOLS_API_KEY=<same key as Magento admin>`.
-- **Optional debug:** `DEVTOOLS_SSR_BRIDGE_DEBUG=1` logs bridge diagnostics to the Node console.
-- **Next.js config helper:** `import { withDevtoolsSsrBridge } from '@bitbabit/devtools-ssr-bridge/next'`.
-- **Instrumentation:** `export { register } from '@bitbabit/devtools-ssr-bridge/instrument'` (see the package README for axios, middleware, and App Router config API).
-- **Magento REST (SSR logs):** the extension panel can read profiler data via `GET /rest/V1/devtools/ssr-logs/:ssrId` (requires Magento module enabled, API key validation as documented, and a valid `ssrId`). Full setup steps and diagrams are in the npm package README.
-
-If you use **only** the browser (no Next.js SSR), you do **not** need the npm package—headers from the extension are enough for Magento.
-
-### Reverse proxy & application servers (Nginx / Apache)
-
-Magento must see **real client scheme and client IP** behind TLS terminators and proxies. The dev tools module also relies on **custom headers** reaching PHP (`X-Debug-Api-Key`, your configured **Profiler Header Key** e.g. `X-Debug-Mode`, and SSR correlation headers such as `X-SSR-ID` / `X-SSR-Source`). If your proxy or app server strips unknown headers, profiling and SSR logging will silently fail.
-
-**Nginx** (reverse proxy to PHP-FPM or to an upstream app server):
-
-```nginx
-# Standard forwarding — required for HTTPS detection, cookies, and IP
-proxy_set_header Host $host;
-proxy_set_header X-Real-IP $remote_addr;
-proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-proxy_set_header X-Forwarded-Proto $scheme;
-proxy_set_header X-Forwarded-Host $host;
-
-# Developer Tools: ensure these pass through (names must match admin + extension config)
-# (If you already forward all request headers, you may omit the following lines.)
-proxy_set_header X-Debug-Api-Key $http_x_debug_api_key;
-proxy_set_header X-Debug-Mode $http_x_debug_mode;
-proxy_set_header X-SSR-ID $http_x_ssr_id;
-proxy_set_header X-SSR-Source $http_x_ssr_source;
-
-# If you use custom header names with underscores, nginx ignores them unless:
-underscores_in_headers on;
-```
-
-**Apache** (`httpd` / `mod_proxy`):
-
-```apache
-# Preserve client host and forward TLS hint to Magento
-ProxyPreserveHost On
-RequestHeader set X-Forwarded-Proto "expr=%{REQUEST_SCHEME}s"
-
-# Optional: forward original client IP if behind another proxy
-RequestHeader set X-Forwarded-For "%{REMOTE_ADDR}e" env=!X-Forwarded-For
-```
-
-`mod_proxy` forwards request headers to the backend by default; if you use `RequestHeader unset` or security modules that strip headers, **allowlist** the same debug headers as above.
-
-**Swoole / RoadRunner / FrankenPHP / other app servers:** ensure the **outer** edge (Nginx/Apache) forwards the full header set to the worker; the PHP stack must receive the same headers as a direct browser request.
-
-**CDN / Varnish / Fastly:** add equivalent pass-through rules so `X-Debug-*` and `X-SSR-*` are not stripped at the edge.
 
 ### Programmatic Debug Logging
 
@@ -329,7 +271,7 @@ For AJAX requests, profiler data is automatically injected into JSON responses:
 - **API Key Authentication**: Secure access control
 - **Timing-Safe Comparison**: Prevents timing attacks
 - **Developer Mode Restriction**: Production safety
-- **Cookie Security**: `Secure` when HTTPS; `SameSite=Lax`. The API key cookie is **not** HttpOnly (so browser extensions / JS can read it—treat XSS on the storefront as a higher risk while the cookie is set)
+- **Cookie Security**: Secure, HTTP-only cookie handling
 
 ## Data Structure
 
@@ -519,12 +461,8 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 ### API Key Security
 - Cryptographically secure key generation
 - Timing-safe string comparison
-- Secure cookie attributes when HTTPS is used
-- Prefer the `X-Debug-Api-Key` header over `api_key` query parameters (query strings are often logged)
-
-### SSR log REST (`/V1/devtools/ssr-logs/{ssrId}`)
-- Web API routes use `anonymous` so browser tools can call Magento without a customer session; **authorization is enforced in** `SsrLogRepository` via `validateApiKey()`.
-- If **Enable API Key Validation** is **off**, anyone who can reach the storefront and knows or guesses an `X-SSR-ID` may read or clear those cache entries—keep validation **on** outside trusted local dev.
+- Secure cookie attributes
+- URL parameter cleanup
 
 ### Access Control
 - Developer mode restrictions
@@ -532,10 +470,9 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 - Request header validation
 
 ### Data Privacy
-- Session details in profiler output are minimized (no full session dump)
-- Request headers like `Authorization`, `Cookie`, and `X-Debug-Api-Key` are redacted in collected profiler data
-- GET/POST parameters whose names suggest secrets (e.g. `password`, `token`) are redacted in profiler output
-- Avoid passing the API key in query strings when possible (URLs often appear in logs and referrers)
+- Limited sensitive data collection (session data capped at 10 items)
+- Configurable data exposure levels
+- Secure transmission headers
 - Memory usage limits to prevent resource exhaustion
 
 ## Troubleshooting

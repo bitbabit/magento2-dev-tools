@@ -3,89 +3,50 @@ declare(strict_types=1);
 
 namespace BitBabit\DeveloperTools\Helper;
 
-use BitBabit\DeveloperTools\Model\DebugInfo;
-use Magento\Framework\App\ObjectManager;
+use BitBabit\DeveloperTools\Service\DebugLogger;
 
 /**
- * Static debug helper that bridges to the DI-managed DebugInfo service.
- *
- * Uses ObjectManager internally so the static API (Debug::info(), etc.)
- * resolves the same shared DebugInfo instance that the Application Server
- * resets via ResetAfterRequestInterface after each request.
- *
- * @package BitBabit\DeveloperTools\Helper
+ * @deprecated Use {@see DebugLogger} (injected). Kept for backward compatibility.
  */
 class Debug
 {
-    /**
-     * @return DebugInfo
-     */
-    private static function getDebugInfo(): DebugInfo
-    {
-        return ObjectManager::getInstance()->get(DebugInfo::class);
+    public function __construct(
+        private DebugLogger $debugLogger
+    ) {
     }
 
-    /**
-     * @param string $message
-     * @param string $level
-     * @param array $context
-     */
-    public static function log(string $message, string $level = 'info', array $context = []): void
+    public function log(string $message, string $level = 'info', array $context = []): void
     {
-        self::getDebugInfo()->addMessage($message, $level, $context);
+        $this->debugLogger->log($message, $level, $context);
     }
 
-    /**
-     * @param string $message
-     * @param array $context
-     */
-    public static function info(string $message, array $context = []): void
+    public function info(string $message, array $context = []): void
     {
-        self::log($message, 'info', $context);
+        $this->debugLogger->info($message, $context);
     }
 
-    /**
-     * @param string $message
-     * @param array $context
-     */
-    public static function warning(string $message, array $context = []): void
+    public function warning(string $message, array $context = []): void
     {
-        self::log($message, 'warning', $context);
+        $this->debugLogger->warning($message, $context);
     }
 
-    /**
-     * @param string $message
-     * @param array $context
-     */
-    public static function error(string $message, array $context = []): void
+    public function error(string $message, array $context = []): void
     {
-        self::log($message, 'error', $context);
+        $this->debugLogger->error($message, $context);
     }
 
-    /**
-     * @param string $name
-     */
-    public static function startTimer(string $name): void
+    public function startTimer(string $name): void
     {
-        self::info("Timer started: {$name}", ['timer_name' => $name, 'action' => 'start']);
+        // Timers are tracked in ComprehensiveProfilerService.
     }
 
-    /**
-     * @param string $name
-     * @param string $message
-     */
-    public static function endTimer(string $name, string $message = ''): void
+    public function endTimer(string $name, string $message = ''): void
     {
-        $msg = $message ?: "Timer ended: {$name}";
-        self::info($msg, ['timer_name' => $name, 'action' => 'end']);
+        // Timers are tracked in ComprehensiveProfilerService.
     }
 
-    /**
-     * @param mixed $var
-     * @param string $label
-     */
-    public static function dump($var, string $label = 'Variable dump'): void
+    public function dump($var, string $label = 'Variable dump'): void
     {
-        self::log($label, 'dump', ['data' => $var]);
+        $this->debugLogger->log($label, 'dump', ['data' => $var]);
     }
 }

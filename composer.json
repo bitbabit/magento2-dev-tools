@@ -1,5 +1,6 @@
 {
     "name": "bitbabit/magento2-dev-tools",
+    "version": "1.2.3",
     "description": "Advanced developer tools for Magento 2 with dynamic control and visualization",
     "type": "magento2-module",
     "license": "MIT",
@@ -22,7 +23,6 @@
         "magento",
         "developer",
         "tools",
-        "SSR",
         "debugging",
         "performance",
         "profiler",

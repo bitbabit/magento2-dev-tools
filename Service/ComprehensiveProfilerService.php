@@ -8,7 +8,6 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\HTTP\PhpEnvironment\Request;
 use Magento\Framework\App\State;
 use Magento\Framework\ObjectManager\ResetAfterRequestInterface;
-use Psr\Log\LoggerInterface;
 use BitBabit\DeveloperTools\Api\ProfilerConfigInterface;
 use BitBabit\DeveloperTools\Model\DebugInfo;
 
@@ -26,10 +25,12 @@ class ComprehensiveProfilerService implements ResetAfterRequestInterface
     private float $applicationStartTime;
 
     /**
-     * Number of query profiles that existed before the current request started.
-     * Used to isolate per-request queries in long-lived processes (Swoole, etc.).
+     * Minimum profiler handle for this request (Zend DB profiler key).
+     * Profiles with handle >= this value belong to the current request.
+     * Uses handles instead of counting finished queries so unfinished boundary queries
+     * and unset/filtered slots do not misalign SQL with params.
      */
-    private int $queryProfileOffset = 0;
+    private int $queryProfileMinHandle = 0;
 
     private const REDACTED_HEADERS = [
         'authorization',
@@ -44,18 +45,14 @@ class ComprehensiveProfilerService implements ResetAfterRequestInterface
     /**
      * @param ResourceConnection $resourceConnection
      * @param ProfilerConfigInterface $config
-     * @param LoggerInterface $logger
      * @param RequestInterface $request
      * @param State $appState
-     * @param DebugInfo $debugInfo
      */
     public function __construct(
         private ResourceConnection $resourceConnection,
         private ProfilerConfigInterface $config,
-        private LoggerInterface $logger,
         private RequestInterface $request,
-        private State $appState,
-        private DebugInfo $debugInfo
+        private State $appState
     ) {
         $this->applicationStartTime = microtime(true);
         $this->startTimer('application_boot');
@@ -68,7 +65,8 @@ class ComprehensiveProfilerService implements ResetAfterRequestInterface
     {
         $this->timers = [];
         $this->applicationStartTime = microtime(true);
-        $this->queryProfileOffset = 0;
+        $this->queryProfileMinHandle = 0;
+        DebugInfo::getInstance()->clear();
     }
 
     /**
@@ -81,15 +79,21 @@ class ComprehensiveProfilerService implements ResetAfterRequestInterface
         $this->applicationStartTime = microtime(true);
         $this->timers = [];
         $this->startTimer('application_boot');
-        $this->debugInfo->clear();
+        DebugInfo::getInstance()->clear();
 
         try {
             $connection = $this->resourceConnection->getConnection();
             $profiler = $connection->getProfiler();
-            $profiles = $profiler->getQueryProfiles();
-            $this->queryProfileOffset = $profiles ? count($profiles) : 0;
+            // Include unfinished profiles when computing max handle so the boundary does not
+            // drift vs count(getQueryProfiles()) when queries span the request edge or slots are unset.
+            $profiles = $profiler->getQueryProfiles(null, true);
+            if ($profiles && \count($profiles) > 0) {
+                $this->queryProfileMinHandle = max(array_keys($profiles)) + 1;
+            } else {
+                $this->queryProfileMinHandle = 0;
+            }
         } catch (\Exception $e) {
-            $this->queryProfileOffset = 0;
+            $this->queryProfileMinHandle = 0;
         }
     }
 
@@ -132,7 +136,7 @@ class ComprehensiveProfilerService implements ResetAfterRequestInterface
             'environment' => $this->getEnvironmentData(),
             'timers' => $this->getTimersData(),
             'metadata' => $this->getMetadata(),
-            'debug_info' => $this->debugInfo->getData()
+            'debug_info' => DebugInfo::getInstance()->getData()
         ];
     }
 
@@ -177,10 +181,10 @@ class ComprehensiveProfilerService implements ResetAfterRequestInterface
 
         $profiles = $profiler->getQueryProfiles();
         if ($profiles) {
-            $allProfiles = array_values($profiles);
-            $requestProfiles = array_slice($allProfiles, $this->queryProfileOffset);
-
-            foreach ($requestProfiles as $profile) {
+            foreach ($profiles as $handle => $profile) {
+                if ((int) $handle < $this->queryProfileMinHandle) {
+                    continue;
+                }
                 $queryTime = $profile->getElapsedSecs();
                 $query = [
                     'query' => $profile->getQuery(),
@@ -332,9 +336,22 @@ class ComprehensiveProfilerService implements ResetAfterRequestInterface
             'generated_at' => date('Y-m-d H:i:s'),
             'timestamp' => time(),
             'request_id' => uniqid('req_'),
-            'profiler_version' => '1.2.0',
+            'profiler_version' => '1.2.3',
             'memory_limit_exceeded' => $this->isMemoryLimitExceeded()
         ];
+    }
+
+    /**
+     * Sanitized inbound headers for debug logging (secrets redacted).
+     *
+     * @return array<string, string>
+     */
+    public function getSanitizedRequestHeaders(): array
+    {
+        /** @var Request $request */
+        $request = $this->request;
+
+        return $this->getSanitizedHeaders($request);
     }
 
     /**
