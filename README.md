@@ -146,7 +146,7 @@ Navigate to **Stores → Configuration → BitBabit → Developer Tools**
 
 #### API Security Settings
 - **Enable API Key Validation**: Require API key for access
-- **API Key**: Encrypted storage of the authentication key
+- **API Key**: Plain-text storage in `core_config_data` (path `bitbabit/dev_tools/api_key`)
 
 ### Console Commands
 

@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- API key admin fields moved into **Developer Tools** group; config paths are only `bitbabit/dev_tools/api_key` and `bitbabit/dev_tools/api_key_enabled` (matches `ProfilerConfig`)
+- API key stored as plain text (removed `Encrypted` backend model)
+
+### Fixed
+- Data patch migrates legacy `bitbabit/api_security/*` rows to `bitbabit/dev_tools/*` and removes duplicates
+
 ## [1.2.3] - 2026-05-21
 
 ### Added
